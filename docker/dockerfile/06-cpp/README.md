@@ -1,16 +1,24 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/cpp.md)
+
 # 06. Dockerfile. Консольное приложение на C++
 
-## Цель
+## 🎯 Цель
 
 Собрать и запустить учебный образ по инструкции источника, зафиксировать команды
 и результат в этом каталоге.
 
-## Источник
+## 🔗 Источник
 
 - Оригинал: [cpp.md](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/cpp.md)
 - Реестр заданий: [TASKS.md](../../../TASKS.md)
 
-## Структура каталога
+## 🧰 Структура каталога
 
 ```text
 06-cpp/
@@ -21,7 +29,7 @@
 └── hello.cpp
 ```
 
-## Сборка и запуск
+## 📋 Сборка и запуск
 
 ```bash
 cd docker/dockerfile/06-cpp
@@ -29,7 +37,7 @@ docker build -t imfua-cpp .
 docker run --rm imfua-cpp
 ```
 
-## Проверка
+## ✅ Проверка
 
 ```bash
 docker run --rm imfua-cpp
@@ -38,13 +46,13 @@ docker run -it --rm --entrypoint sh imfua-cpp
 
 Ожидаемый вывод: `Hello, Docker! from C++`.
 
-## Порты
+## 🧰 Порты
 
 Порты не используются.
 
 
 
-## Результаты
+## 📊 Результаты
 
 - Статус сборки: `НЕ ВЫПОЛНЯЛАСЬ (в этой среде нет Docker)`
 - Имя образа: `imfua-cpp`
@@ -57,3 +65,5 @@ docker run -it --rm --entrypoint sh imfua-cpp
 ![Результат выполнения задания](evidence/screenshot.png)
 
 > **Внимание:** в этой среде нет Docker, реальная сборка и запуск не выполнялись. Все шаги ниже проверены только статически; реальные логи и скриншоты добавляются на машине с Docker.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

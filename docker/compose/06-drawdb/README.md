@@ -1,3 +1,11 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/drawDB.md)
+
 # 06. drawDB (Docker Compose)
 
 > **Важно:** в среде preparation Docker отсутствует. Конфигурация проверена статически,
@@ -7,7 +15,7 @@
 - Апстрим: [drawdb-io/drawdb](https://github.com/drawdb-io/drawdb) (его `compose.yml` — основа этого задания)
 - Локальная копия источника: `/tmp/opencode/imfua-src/content/Docker/DockerCompose/drawDB.md`
 
-## Состав сервисов
+## 🧰 Состав сервисов
 
 | Сервис | Образ | Порт хоста | Назначение |
 |---|---|---|---|
@@ -18,7 +26,7 @@
 - Сеть `drawdb-network` (driver `bridge`) — как `default: driver: bridge` в апстриме.
 - Нет томов с данными БД: drawDB работает в браузере, диаграммы сохраняются локально/через экспорт.
 
-## Пошаговый запуск
+## 📋 Пошаговый запуск
 
 1. Проверьте, что порт 5173 свободен: `docker compose ls`.
 2. Положите исходники drawDB в `./app`:
@@ -36,14 +44,14 @@
    # или: bash commands.sh up
    ```
 
-## Проверка
+## ✅ Проверка
 
 - Статус: `docker compose ps` (healthcheck становится healthy после старта Vite).
 - Логи: `docker compose logs -f drawdb`.
 - Приложение: http://localhost:5173
 - Постройте простую ER-диаграмму и экспортируйте SQL — результат зафиксируйте в отчёте.
 
-## Остановка и очистка
+## 🧹 Остановка и очистка
 
 ```bash
 docker compose down
@@ -54,7 +62,7 @@ docker compose down --rmi all -v   # полная очистка по образ
 
 > Исходники в `./app` и артефакты `npm` — bind-монт, `down -v` их не удаляет.
 
-## Результаты
+## 📊 Результаты
 
 - Дата запуска: `<заполнить при реальном запуске>`
 - Статус сервиса: `<вставить вывод docker compose ps>`
@@ -64,3 +72,5 @@ docker compose down --rmi all -v   # полная очистка по образ
 Скриншот (замените этот блок реальным файлом, например `evidence/drawdb.png`):
 
 ![Скриншот drawDB](evidence/drawdb.png)
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

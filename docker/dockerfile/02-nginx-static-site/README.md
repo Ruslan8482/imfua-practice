@@ -1,16 +1,24 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/my-site.md)
+
 # 02. Dockerfile. Статический сайт на Nginx
 
-## Цель
+## 🎯 Цель
 
 Собрать и запустить учебный образ по инструкции источника, зафиксировать команды
 и результат в этом каталоге.
 
-## Источник
+## 🔗 Источник
 
 - Оригинал: [my-site.md](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/my-site.md)
 - Реестр заданий: [TASKS.md](../../../TASKS.md)
 
-## Структура каталога
+## 🧰 Структура каталога
 
 ```text
 02-nginx-static-site/
@@ -22,7 +30,7 @@
     └── index.html
 ```
 
-## Сборка и запуск
+## 📋 Сборка и запуск
 
 ```bash
 cd docker/dockerfile/02-nginx-static-site
@@ -36,7 +44,7 @@ docker run -d -p 8081:80 --name imfua-nginx-site imfua-nginx-site
 docker run -d -p 8081:80 --name imfua-nginx-site-dev -v "$(pwd)/site":/usr/share/nginx/html nginx:alpine
 ```
 
-## Проверка
+## ✅ Проверка
 
 ```bash
 curl -f http://localhost:8081/
@@ -44,13 +52,13 @@ curl -f http://localhost:8081/
 
 или открыть <http://localhost:8081> в браузере.
 
-## Порты
+## 🧰 Порты
 
 Хост `8081` → контейнер `80` (Nginx).
 
 
 
-## Результаты
+## 📊 Результаты
 
 - Статус сборки: `НЕ ВЫПОЛНЯЛАСЬ (в этой среде нет Docker)`
 - Имя образа: `imfua-nginx-site`
@@ -63,3 +71,5 @@ curl -f http://localhost:8081/
 ![Результат выполнения задания](evidence/screenshot.png)
 
 > **Внимание:** в этой среде нет Docker, реальная сборка и запуск не выполнялись. Все шаги ниже проверены только статически; реальные логи и скриншоты добавляются на машине с Docker.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

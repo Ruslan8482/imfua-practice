@@ -1,0 +1,87 @@
+===== BEGIN 01_schema.sql =====
+Tables_in_sales_norm
+customers
+products
+report_items
+reports
+sales_unnormalized_2
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+report_id	report_date	customer_id	customer_name	product_id	product_name	price	quantity
+1101	2026-03-05	12	Дания	101	Дыни	800.00	1100
+1101	2026-03-05	12	Дания	102	Клубника	150.00	300
+1102	2026-03-07	23	Испания	103	Яблоки	120.00	1700
+1103	2026-03-08	25	Албания	104	Лимоны	200.00	500
+1104	2026-03-10	12	Дания	101	Дыни	800.00	2500
+1105	2026-03-12	25	Албания	103	Яблоки	120.00	2000
+1105	2026-03-12	25	Албания	104	Лимоны	200.00	700
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+customer_id	customer_name
+12	Дания
+23	Испания
+25	Албания
+product_id	product_name	price
+101	Дыни	800.00
+102	Клубника	150.00
+103	Яблоки	120.00
+104	Лимоны	200.00
+report_id	report_date	customer_id
+1101	2026-03-05	12
+1102	2026-03-07	23
+1103	2026-03-08	25
+1104	2026-03-10	12
+1105	2026-03-12	25
+report_id	product_id	quantity
+1101	101	1100
+1101	102	300
+1102	103	1700
+1103	104	500
+1104	101	2500
+1105	103	2000
+1105	104	700
+total_old
+3609000.00
+total_new
+3609000.00
+old_reports
+5
+new_reports
+5
+old_customers
+3
+new_customers
+3
+old_products
+4
+new_products
+4
+old_items
+7
+new_items
+7
+customer_id	customer_name	total
+12	Дания	2925000.00
+customer_id	customer_name	total
+12	Дания	2925000.00
+23	Испания	204000.00
+25	Албания	480000.00
+customer_id	customer_name
+12	Дания (новое имя)
+12	Дания
+customer_id	customer_name
+12	Дания (новое имя)
+customer_id	customer_name
+12	Дания (новое имя)
+customer_id	customer_name
+12	Дания (новое имя)
+report_id	report_date	customer_id	customer_name	product_id	product_name	price	quantity
+NULL	NULL	99	Новый покупатель	NULL	NULL	NULL	NULL
+customer_id	customer_name
+99	Новый покупатель
+Tables_in_sales_norm
+customers
+products
+report_items
+reports
+===== END 03_queries.sql : exit=0 =====

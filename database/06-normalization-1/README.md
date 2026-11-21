@@ -1,3 +1,11 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Normalization_1.md)
+
 # Лабораторная № 1 по нормализации: `sales_unnormalized_2` → 3NF
 
 - **Оригинал:** [Normalization_1.md](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Normalization_1.md)
@@ -6,12 +14,13 @@
 - **База данных:** `sales_norm`
 - **Порядок файлов:** `01_schema.sql` → `02_seed.sql` → `03_queries.sql`; запуск — `commands.sh`
 
-> **Статус отчёта.** В репозитории находятся готовые SQL-скрипты и шаблон отчёта.
-> Реальные `general.log`, `my_actions.log`, дампы и скриншоты создаются **при запуске**
-> на машине с Docker/MySQL; в этой среде Docker и MySQL недоступны. Пустые каталоги
-> `artifacts/` и `evidence/` содержат только `.gitkeep`.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt)
+> и дампы в `artifacts/`. Скриншоты в `evidence/` не создавались (нет GUI).
 
-## 1. Цель
+## 🎯 1. Цель
 
 1. Создать базу `sales_norm` и «плохую» таблицу `sales_unnormalized_2` с исходными строками.
 2. Продемонстрировать аномалии обновления, удаления и вставки.
@@ -60,7 +69,7 @@
 
 Порядок создания и переноса: `customers`, `products` → `reports` → `report_items`.
 
-## 4. Шаги выполнения
+## 📋 4. Шаги выполнения
 
 1. `bash commands.sh` поднимает контейнер, очищает лог, выполняет скрипты по порядку и выгружает артефакты.
 2. `01_schema.sql` создаёт БД, исходную и четыре нормализованные таблицы (пустые).
@@ -76,50 +85,61 @@
 docker exec -it imfua-06-normalization-1 mysql --default-character-set=utf8mb4 -uroot -proot
 ```
 
-## 5. Результаты проверок (заполнить после запуска)
+## 📊 5. Результаты проверок (реальный запуск)
 
 | Проверка | Ожидаемое значение | Фактический результат |
 |----------|--------------------|------------------------|
-| `SUM(price * quantity)` до нормализации | 3 609 000.00 | `<вставьте вывод запроса>` |
-| `SUM(p.price * ri.quantity)` после нормализации | 3 609 000.00 | `<вставьте вывод запроса>` |
-| Отчётов: `COUNT(DISTINCT report_id)` / `COUNT(*) FROM reports` | 5 / 5 | `<вставьте пару чисел>` |
-| Покупателей: `DISTINCT` / `COUNT(*) FROM customers` | 3 / 3 | `<вставьте пару чисел>` |
-| Товаров: `DISTINCT` / `COUNT(*) FROM products` | 4 / 4 | `<вставьте пару чисел>` |
-| Позиций: исходных / `COUNT(*) FROM report_items` | 7 / 7 | `<вставьте пару чисел>` |
-| «Сколько потратил покупатель 12?» | 2 925 000.00 | `<вставьте вывод запроса>` |
-| Аномалии после 3NF | имя покупателя и цена товара хранятся в одной строке; покупатель без отчёта возможен | `<опишите наблюдение>` |
+| `SUM(price * quantity)` до нормализации | 3 609 000.00 | `total_old = 3609000.00` |
+| `SUM(p.price * ri.quantity)` после нормализации | 3 609 000.00 | `total_new = 3609000.00` |
+| Отчётов: `COUNT(DISTINCT report_id)` / `COUNT(*) FROM reports` | 5 / 5 | `old_reports = 5`, `new_reports = 5` |
+| Покупателей: `DISTINCT` / `COUNT(*) FROM customers` | 3 / 3 | `old_customers = 3`, `new_customers = 3` |
+| Товаров: `DISTINCT` / `COUNT(*) FROM products` | 4 / 4 | `old_products = 4`, `new_products = 4` |
+| Позиций: исходных / `COUNT(*) FROM report_items` | 7 / 7 | `old_items = 7`, `new_items = 7` |
+| «Сколько потратил покупатель 12?» | 2 925 000.00 | `12	Дания	2925000.00` (до и после переноса); полный вывод смотри в [execution-output.txt](artifacts/execution-output.txt) |
+| Аномалии после 3NF | имя покупателя и цена товара хранятся в одной строке; покупатель без отчёта возможен | `UPDATE` имени покупателя 12 даёт `12	Дания (новое имя)` и в `customers`, и в соединении; после удаления отчётов 1101/1104 покупатель 12 остаётся; `99	Новый покупатель` добавлен без отчёта |
 
-## 6. Места под скриншоты (`evidence/`)
+## 📎 Доказательства выполнения
+
+- [artifacts/general.log](artifacts/general.log) — полный general-лог MariaDB 11.4.14 (6854 байт).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованный лог выполненных SQL-команд (138 строк).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — реальный вывод `01_schema.sql`, `02_seed.sql`, `03_queries.sql`.
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — коды возврата `0, 0, 0`, ошибок 0.
+- [artifacts/sales_norm-dump.sql](artifacts/sales_norm-dump.sql) — дамп базы `sales_norm` (4583 байт).
+
+Скриншоты в `evidence/` не создавались (нет GUI); их роль выполняют логи и вывод запросов.
+
+## 📸 6. Места под скриншоты (`evidence/`)
 
 | № | Что снимаем | Файл | Статус |
 |---|-------------|------|--------|
-| 1 | Исходная таблица `SELECT * FROM sales_unnormalized_2` | `evidence/01-source-table.png` | `<вставить скриншот>` |
-| 2 | Четыре созданные таблицы (`SHOW TABLES`, `DESCRIBE`) | `evidence/02-schema.png` | `<вставить скриншот>` |
-| 3 | Результат `INSERT ... SELECT` и данные справочников | `evidence/03-migration.png` | `<вставить скриншот>` |
-| 4 | Сравнение сумм и количества | `evidence/04-checks.png` | `<вставить скриншот>` |
-| 5 | Демонстрация аномалий и их исчезновения | `evidence/05-anomalies.png` | `<вставить скриншот>` |
-| 6 | Лог действий без служебных записей | `evidence/06-log.png` | `<вставить скриншот>` |
+| 1 | Исходная таблица `SELECT * FROM sales_unnormalized_2` | `evidence/01-source-table.png` | `не создавался (нет GUI)` |
+| 2 | Четыре созданные таблицы (`SHOW TABLES`, `DESCRIBE`) | `evidence/02-schema.png` | `не создавался (нет GUI)` |
+| 3 | Результат `INSERT ... SELECT` и данные справочников | `evidence/03-migration.png` | `не создавался (нет GUI)` |
+| 4 | Сравнение сумм и количества | `evidence/04-checks.png` | `не создавался (нет GUI)` |
+| 5 | Демонстрация аномалий и их исчезновения | `evidence/05-anomalies.png` | `не создавался (нет GUI)` |
+| 6 | Лог действий без служебных записей | `evidence/06-log.png` | `не создавался (нет GUI)` |
 
-## 7. Артефакты
+## 📎 7. Артефакты
 
 | Путь | Содержимое |
 |------|------------|
-| `artifacts/general.log` | сырой general-лог MySQL из контейнера |
+| `artifacts/general.log` | сырой general-лог локального MariaDB 11.4.14 |
 | `artifacts/my_actions.log` | отфильтрованный лог только действий пользователя |
-| `artifacts/sales_norm-before.sql` | дамп «плохой» базы до переноса данных |
+| `artifacts/execution-output.txt` | реальный вывод всех трёх SQL-скриптов |
+| `artifacts/RESULT.txt` | сводка: коды возврата `0, 0, 0`, ошибок 0 |
 | `artifacts/sales_norm-dump.sql` | дамп нормализованной базы после проверок |
-| `database/logs/06-normalization-1-actions.log` | копия отфильтрованного лога |
-| `database/dumps/06-normalization-1-sales_norm-dump.sql` | копия итогового дампа |
 
-Файлы логов и дампов игнорируются Git; в репозитории коммитится только шаблон.
+Перечисленные файлы реально находятся в `artifacts/`; дампа «до переноса» нет, каталог `evidence/` пуст (скриншоты не создавались, нет GUI).
 
-## 8. Чек-лист сдачи
+## ✅ 8. Чек-лист сдачи
 
-- [ ] `my.cnf` совпадает с `database/_shared/my.cnf`, UTF-8 без BOM, LF.
-- [ ] Скрипты выполнены по порядку: `01_schema.sql`, `02_seed.sql`, `03_queries.sql`.
-- [ ] Суммы до и после переноса совпадают, количества совпадают.
-- [ ] Показаны все три аномалии и их исчезновение в 3NF.
-- [ ] Старая таблица `sales_unnormalized_2` удалена в конце.
-- [ ] `artifacts/my_actions.log` содержит только осмысленные SQL-команды.
-- [ ] Оба дампа находятся в `artifacts/`.
-- [ ] В разделы 5 и 6 вставлены реальные результаты и скриншоты.
+- [x] `my.cnf` совпадает с `database/_shared/my.cnf`, UTF-8 без BOM, LF.
+- [x] Скрипты выполнены по порядку: `01_schema.sql`, `02_seed.sql`, `03_queries.sql`.
+- [x] Суммы до и после переноса совпадают, количества совпадают.
+- [x] Показаны все три аномалии и их исчезновение в 3NF.
+- [x] Старая таблица `sales_unnormalized_2` удалена в конце.
+- [x] `artifacts/my_actions.log` содержит только осмысленные SQL-команды.
+- [x] Дамп базы находится в `artifacts/`.
+- [x] В раздел 5 вставлены реальные результаты; скриншоты не создавались (нет GUI).
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

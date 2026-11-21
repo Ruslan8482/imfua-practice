@@ -1,0 +1,163 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   620 Quit	
+		   621 Connect	root@localhost on  using SSL/TLS
+		   621 Query	DROP DATABASE IF EXISTS orders_class_norm
+		   621 Query	CREATE DATABASE IF NOT EXISTS orders_class_norm
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   621 Query	SELECT DATABASE()
+		   621 Init DB	orders_class_norm
+		   621 Query	DROP TABLE IF EXISTS order_items
+		   621 Query	DROP TABLE IF EXISTS orders
+		   621 Query	DROP TABLE IF EXISTS products
+		   621 Query	DROP TABLE IF EXISTS classifications
+		   621 Query	DROP TABLE IF EXISTS customers
+		   621 Query	DROP TABLE IF EXISTS orders_class_unnormalized
+		   621 Query	CREATE TABLE orders_class_unnormalized (
+    order_id   INT,
+    order_date DATE,
+    client_id  INT,
+    client_name VARCHAR(100),
+    product_id INT,
+    product_name VARCHAR(100),
+    price      DECIMAL(10,2),
+    class_id   INT,
+    class_name VARCHAR(100),
+    quantity   INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   621 Query	CREATE TABLE customers (
+    client_id   INT NOT NULL,
+    client_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (client_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   621 Query	CREATE TABLE classifications (
+    class_id   INT NOT NULL,
+    class_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (class_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   621 Query	CREATE TABLE products (
+    product_id   INT NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    price        DECIMAL(10,2) NOT NULL,
+    class_id     INT NOT NULL,
+    PRIMARY KEY (product_id),
+    CONSTRAINT fk_products_class FOREIGN KEY (class_id)
+        REFERENCES classifications (class_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   621 Query	CREATE TABLE orders (
+    order_id   INT NOT NULL,
+    order_date DATE NOT NULL,
+    client_id  INT NOT NULL,
+    PRIMARY KEY (order_id),
+    CONSTRAINT fk_orders_customer FOREIGN KEY (client_id)
+        REFERENCES customers (client_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   621 Query	CREATE TABLE order_items (
+    order_id   INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity   INT NOT NULL,
+    PRIMARY KEY (order_id, product_id),
+    CONSTRAINT fk_items_order   FOREIGN KEY (order_id)
+        REFERENCES orders (order_id),
+    CONSTRAINT fk_items_product FOREIGN KEY (product_id)
+        REFERENCES products (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   621 Query	SHOW TABLES
+		   621 Quit	
+		   622 Connect	root@localhost on  using SSL/TLS
+		   622 Query	SELECT DATABASE()
+		   622 Init DB	orders_class_norm
+		   622 Query	INSERT INTO orders_class_unnormalized VALUES
+(7001, '2026-12-01', 801, 'ООО «Ромашка»', 401, 'Монитор',    15000.00, 1, 'Электроника', 2),
+(7001, '2026-12-01', 801, 'ООО «Ромашка»', 402, 'Мышь',        1000.00, 1, 'Электроника', 3),
+(7002, '2026-12-02', 802, 'ООО «Василёк»', 403, 'Стул',        4500.00, 2, 'Мебель',      4),
+(7003, '2026-12-03', 801, 'ООО «Ромашка»', 404, 'Клавиатура',  2000.00, 1, 'Электроника', 1),
+(7003, '2026-12-03', 801, 'ООО «Ромашка»', 405, 'Стол',       12000.00, 2, 'Мебель',      1),
+(7004, '2026-12-04', 803, 'ИП Петров',     402, 'Мышь',        1000.00, 1, 'Электроника', 5)
+		   622 Query	SELECT * FROM orders_class_unnormalized ORDER BY order_id, product_id
+		   622 Quit	
+		   623 Connect	root@localhost on  using SSL/TLS
+		   623 Query	SELECT DATABASE()
+		   623 Init DB	orders_class_norm
+		   623 Query	INSERT INTO customers (client_id, client_name)
+SELECT DISTINCT client_id, client_name
+FROM orders_class_unnormalized
+		   623 Query	INSERT INTO classifications (class_id, class_name)
+SELECT DISTINCT class_id, class_name
+FROM orders_class_unnormalized
+		   623 Query	INSERT INTO products (product_id, product_name, price, class_id)
+SELECT DISTINCT product_id, product_name, price, class_id
+FROM orders_class_unnormalized
+		   623 Query	INSERT INTO orders (order_id, order_date, client_id)
+SELECT DISTINCT order_id, order_date, client_id
+FROM orders_class_unnormalized
+		   623 Query	INSERT INTO order_items (order_id, product_id, quantity)
+SELECT order_id, product_id, quantity
+FROM orders_class_unnormalized
+		   623 Query	SELECT * FROM customers
+		   623 Query	SELECT * FROM classifications
+		   623 Query	SELECT * FROM products
+		   623 Query	SELECT * FROM orders
+		   623 Query	SELECT * FROM order_items
+		   623 Query	SELECT SUM(price * quantity) AS total_old
+FROM orders_class_unnormalized
+		   623 Query	SELECT SUM(p.price * oi.quantity) AS total_new
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+		   623 Query	SELECT COUNT(DISTINCT order_id) AS old_orders FROM orders_class_unnormalized
+		   623 Query	SELECT COUNT(*) AS new_orders FROM orders
+		   623 Query	SELECT COUNT(*) AS old_customers FROM
+    (SELECT DISTINCT client_id FROM orders_class_unnormalized) AS t
+		   623 Query	SELECT COUNT(*) AS new_customers FROM customers
+		   623 Query	SELECT COUNT(*) AS old_products FROM
+    (SELECT DISTINCT product_id FROM orders_class_unnormalized) AS t
+		   623 Query	SELECT COUNT(*) AS new_products FROM products
+		   623 Query	SELECT COUNT(*) AS old_classes FROM
+    (SELECT DISTINCT class_id FROM orders_class_unnormalized) AS t
+		   623 Query	SELECT COUNT(*) AS new_classes FROM classifications
+		   623 Query	SELECT COUNT(*) AS old_items FROM orders_class_unnormalized
+		   623 Query	SELECT COUNT(*) AS new_items FROM order_items
+		   623 Query	SELECT c.client_id, c.client_name,
+       SUM(p.price * oi.quantity) AS total
+FROM customers c
+JOIN orders o       ON c.client_id = o.client_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p     ON oi.product_id = p.product_id
+WHERE c.client_id = 801
+GROUP BY c.client_id, c.client_name
+		   623 Query	SELECT cl.class_id, cl.class_name,
+       SUM(p.price * oi.quantity) AS total
+FROM classifications cl
+JOIN products p     ON cl.class_id = p.class_id
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY cl.class_id, cl.class_name
+ORDER BY cl.class_id
+		   623 Query	START TRANSACTION
+		   623 Query	UPDATE orders_class_unnormalized
+SET class_name = 'Бытовая техника'
+WHERE order_id = 7001 AND product_id = 401
+		   623 Query	SELECT DISTINCT class_id, class_name
+FROM orders_class_unnormalized
+WHERE class_id = 1
+		   623 Query	UPDATE classifications SET class_name = 'Бытовая техника' WHERE class_id = 1
+		   623 Query	SELECT * FROM classifications WHERE class_id = 1
+		   623 Query	DELETE FROM orders_class_unnormalized WHERE client_id = 801
+		   623 Query	SELECT * FROM orders_class_unnormalized WHERE client_id = 801
+		   623 Query	SELECT * FROM customers WHERE client_id = 801
+		   623 Query	DELETE FROM order_items WHERE order_id IN (7001, 7003)
+		   623 Query	DELETE FROM orders WHERE order_id IN (7001, 7003)
+		   623 Query	SELECT * FROM customers WHERE client_id = 801
+		   623 Query	SELECT * FROM products WHERE class_id = 1
+		   623 Query	SELECT * FROM classifications
+		   623 Query	INSERT INTO orders_class_unnormalized (class_id, class_name)
+VALUES (3, 'Одежда')
+		   623 Query	SELECT * FROM orders_class_unnormalized WHERE class_id = 3
+		   623 Query	INSERT INTO classifications (class_id, class_name)
+VALUES (3, 'Одежда')
+		   623 Query	SELECT * FROM classifications WHERE class_id = 3
+		   623 Query	ROLLBACK
+		   623 Query	DROP TABLE orders_class_unnormalized
+		   623 Query	SHOW TABLES
+		   623 Quit	

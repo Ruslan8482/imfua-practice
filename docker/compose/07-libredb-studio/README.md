@@ -1,3 +1,11 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/LibreDB_Studio.md)
+
 # 07. LibreDB Studio (Docker Compose)
 
 > **Важно:** в среде preparation Docker отсутствует. Конфигурация проверена статически,
@@ -6,7 +14,7 @@
 - Оригинал: [LibreDB_Studio.md](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/LibreDB_Studio.md)
 - Локальная копия источника: `/tmp/opencode/imfua-src/content/Docker/DockerCompose/LibreDB_Studio.md`
 
-## Состав сервисов
+## 🧰 Состав сервисов
 
 | Сервис | Образ | Порт хоста | Назначение |
 |---|---|---|---|
@@ -16,7 +24,7 @@
 - Сеть `libredb-network` (bridge).
 - healthcheck `wget --spider http://localhost:3000` — как в источнике.
 
-## Пошаговый запуск
+## 📋 Пошаговый запуск
 
 1. Проверьте порт 3000 и имя контейнера:
    ```bash
@@ -33,14 +41,14 @@
    # или: bash commands.sh up
    ```
 
-## Проверка
+## ✅ Проверка
 
 - Статус: `docker compose ps -a`; логи: `docker compose logs --tail=20 libredb-studio`, `docker compose logs -f`.
 - Приложение: http://localhost:3000
 - Логин: `ADMIN_EMAIL` и `ADMIN_PASSWORD` из `.env` (по умолчанию `admin@libredb.org` / заглушка).
 - Создайте тестовое подключение к БД и выполните запрос — результат зафиксируйте в отчёте.
 
-## Остановка и очистка
+## 🧹 Остановка и очистка
 
 ```bash
 docker compose down
@@ -48,7 +56,7 @@ docker compose down -v   # удалит том libredb-data (все настро
 # или: bash commands.sh clean
 ```
 
-## Результаты
+## 📊 Результаты
 
 - Дата запуска: `<заполнить при реальном запуске>`
 - Статус healthcheck: `<вставить вывод docker compose ps>`
@@ -58,3 +66,5 @@ docker compose down -v   # удалит том libredb-data (все настро
 Скриншот (замените этот блок реальным файлом, например `evidence/libredb.png`):
 
 ![Скриншот LibreDB Studio](evidence/libredb.png)
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

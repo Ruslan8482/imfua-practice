@@ -100,8 +100,9 @@ EXPLAIN SELECT o.id, o.amount, u.name
 FROM orders o
 LEFT JOIN users u ON o.user_id = u.id;
 
--- MySQL 8.0.18+: Hash Join виден через EXPLAIN FORMAT=TREE
-EXPLAIN FORMAT=TREE
+-- MySQL 8.0.18+: EXPLAIN FORMAT=TREE
+-- MariaDB 11.4: FORMAT=JSON вместо TREE.
+EXPLAIN FORMAT=JSON
 SELECT o.id, o.amount, u.name
 FROM orders o
 JOIN users u ON o.user_id = u.id

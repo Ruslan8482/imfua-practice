@@ -1,0 +1,59 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   545 Quit	
+		   546 Connect	root@localhost on  using SSL/TLS
+		   546 Query	DROP DATABASE IF EXISTS my_database
+		   546 Query	SHOW VARIABLES LIKE 'character_set%'
+		   546 Query	SHOW DATABASES
+		   546 Query	CREATE DATABASE my_database
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   546 Query	SELECT DATABASE()
+		   546 Init DB	my_database
+		   546 Query	CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   546 Query	SELECT DATABASE()
+		   546 Init DB	my_database
+		   546 Query	SHOW TABLES
+		   546 Quit	
+		   547 Connect	root@localhost on  using SSL/TLS
+		   547 Query	SELECT DATABASE()
+		   547 Init DB	my_database
+		   547 Query	INSERT INTO users (name, email) VALUES
+  ('Иван Иванов', 'ivan@example.com'),
+  ('Пётр Петров', 'petr@example.com'),
+  ('Мария Сидорова', 'maria@example.com')
+		   547 Query	SELECT * FROM users
+		   547 Query	SELECT * FROM users
+		   547 Query	INSERT INTO users (name, email) VALUES ('Павел Иванов', 'pavel@example.com')
+		   547 Query	INSERT INTO users (name, email) VALUES ('Марк Аврелий', 'mark@example.com')
+		   547 Query	SELECT name, HEX(name) FROM users WHERE id = 1
+		   547 Query	SELECT * FROM users
+		   547 Quit	
+		   548 Connect	root@localhost on  using SSL/TLS
+		   548 Query	SELECT DATABASE()
+		   548 Init DB	my_database
+		   548 Query	UPDATE users SET name = 'Иван Петров' WHERE id = 1
+		   548 Query	UPDATE users SET name = 'Vasya' WHERE id = 1
+		   548 Query	SELECT * FROM users
+		   548 Query	SELECT * FROM users WHERE id = 1
+		   548 Query	SELECT name, email FROM users
+		   548 Query	SELECT name FROM users
+		   548 Query	SELECT name, email FROM users WHERE id = 1
+		   548 Quit	
+		   549 Connect	root@localhost on  using SSL/TLS
+		   549 Query	SELECT DATABASE()
+		   549 Init DB	my_database
+		   549 Query	SHOW TABLES
+		   549 Query	SELECT * FROM users
+		   549 Query	DELETE FROM users WHERE id = 2
+		   549 Query	SELECT * FROM users
+		   549 Query	DROP TABLE users
+		   549 Query	SHOW TABLES
+		   549 Query	DROP DATABASE my_database
+		   549 Query	SHOW DATABASES
+		   549 Quit	

@@ -1,0 +1,72 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   634 Quit	
+		   635 Connect	root@localhost on  using SSL/TLS
+		   635 Query	DROP DATABASE IF EXISTS index_practice
+		   635 Query	CREATE DATABASE index_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   635 Query	SELECT DATABASE()
+		   635 Init DB	index_practice
+		   635 Query	CREATE TABLE customers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    city VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   635 Query	CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'new',
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   635 Quit	
+		   636 Connect	root@localhost on  using SSL/TLS
+		   636 Query	SELECT DATABASE()
+		   636 Init DB	index_practice
+		   636 Query	INSERT INTO customers (name, email, city) VALUES
+  ('Иван Иванов', 'ivan@example.com', 'Москва'),
+  ('Пётр Петров', 'petr@example.com', 'Санкт-Петербург'),
+  ('Мария Сидорова', 'maria@example.com', 'Москва'),
+  ('Алексей Смирнов', 'alex@example.com', 'Казань'),
+  ('Ольга Кузнецова', 'olga@example.com', 'Новосибирск')
+		   636 Query	INSERT INTO orders (customer_id, order_date, amount, status) VALUES
+  (1, '2026-10-01', 1500.00, 'paid'),
+  (1, '2026-10-05', 2300.50, 'paid'),
+  (2, '2026-10-03', 800.00, 'new'),
+  (3, '2026-10-07', 4200.00, 'paid'),
+  (3, '2026-10-10', 1100.00, 'cancelled'),
+  (4, '2026-10-12', 950.00, 'new')
+		   636 Query	SHOW TABLES
+		   636 Query	SELECT * FROM customers
+		   636 Query	SELECT * FROM orders
+		   636 Quit	
+261121 22:44:24	   637 Connect	root@localhost on  using SSL/TLS
+		   637 Query	SELECT DATABASE()
+		   637 Init DB	index_practice
+		   637 Query	SHOW INDEX FROM orders
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE amount > 1000
+		   637 Query	CREATE INDEX idx_amount ON orders(amount)
+		   637 Query	SHOW INDEX FROM orders
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE amount > 1000
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE YEAR(order_date) = 2026
+		   637 Query	CREATE INDEX idx_order_date ON orders(order_date)
+		   637 Query	SHOW INDEX FROM orders
+		   637 Query	EXPLAIN SELECT * FROM orders
+WHERE order_date >= '2026-01-01' AND order_date < '2027-01-01'
+		   637 Query	CREATE INDEX idx_status_amount ON orders(status, amount)
+		   637 Query	SHOW INDEX FROM orders
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE status = 'paid'
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE status = 'paid' AND amount > 1000
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE amount > 1000
+		   637 Query	DROP INDEX idx_amount ON orders
+		   637 Query	EXPLAIN SELECT * FROM orders WHERE amount > 1000
+		   637 Query	CREATE INDEX idx_amount ON orders(amount)
+		   637 Query	CREATE INDEX idx_customer_amount ON orders(customer_id, amount)
+		   637 Query	EXPLAIN SELECT customer_id, SUM(amount) FROM orders GROUP BY customer_id
+		   637 Query	ANALYZE SELECT * FROM orders WHERE amount > 1000
+		   637 Quit	

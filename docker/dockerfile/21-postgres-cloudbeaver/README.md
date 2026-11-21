@@ -1,16 +1,24 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/README.md)
+
 # 21. PostgreSQL + CloudBeaver
 
-## Цель
+## 🎯 Цель
 
 Собрать и запустить учебный образ по инструкции источника, зафиксировать команды
 и результат в этом каталоге.
 
-## Источник
+## 🔗 Источник
 
 - Оригинал: [README.md](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/README.md)
 - Реестр заданий: [TASKS.md](../../../TASKS.md)
 
-## Структура каталога
+## 🧰 Структура каталога
 
 ```text
 21-postgres-cloudbeaver/
@@ -24,7 +32,7 @@
 └── commands.sh
 ```
 
-## Сборка и запуск
+## 📋 Сборка и запуск
 
 ```bash
 cd docker/dockerfile/21-postgres-cloudbeaver
@@ -34,7 +42,7 @@ bash commands.sh up           # = docker compose up -d --build
 
 Откройте CloudBeaver, согласитесь с лицензией, создайте соединение `PostgreSQL`: Host=`db`, Port=`5432`, Database=`imfua_demo`, User/Password из `.env`.
 
-## Проверка
+## ✅ Проверка
 
 ```bash
 docker compose ps
@@ -42,7 +50,7 @@ docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SEL
 curl -f http://localhost:8978/
 ```
 
-## Порты
+## 🧰 Порты
 
 - Хост `5432` → контейнер `5432` (PostgreSQL).
 - Хост `8978` → контейнер `8978` (CloudBeaver).
@@ -53,7 +61,7 @@ curl -f http://localhost:8978/
 
 Задание самостоятельное: готового пошагового кода в источнике нет, поэтому конфигурация составлена на основе раздела «Самостоятельно» README источника.
 
-## Результаты
+## 📊 Результаты
 
 - Статус сборки: `НЕ ВЫПОЛНЯЛАСЬ (в этой среде нет Docker)`
 - Имя образа: `imfua-postgres-cloudbeaver`
@@ -66,3 +74,5 @@ curl -f http://localhost:8978/
 ![Результат выполнения задания](evidence/screenshot.png)
 
 > **Внимание:** в этой среде нет Docker, реальная сборка и запуск не выполнялись. Все шаги ниже проверены только статически; реальные логи и скриншоты добавляются на машине с Docker.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

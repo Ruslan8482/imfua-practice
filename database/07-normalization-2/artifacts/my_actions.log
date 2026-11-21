@@ -1,0 +1,143 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   600 Query	DROP DATABASE IF EXISTS sales_norm
+		   600 Query	CREATE DATABASE IF NOT EXISTS sales_norm
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   600 Query	SELECT DATABASE()
+		   600 Init DB	sales_norm
+		   600 Query	DROP TABLE IF EXISTS sale_items
+		   600 Query	DROP TABLE IF EXISTS sales
+		   600 Query	DROP TABLE IF EXISTS products
+		   600 Query	DROP TABLE IF EXISTS clients
+		   600 Query	DROP TABLE IF EXISTS sales_unnormalized
+		   600 Query	CREATE TABLE sales_unnormalized (
+    sale_id       INT,
+    sale_date     DATE,
+    client_id     INT,
+    client_name   VARCHAR(100),
+    client_city   VARCHAR(100),
+    product_id    INT,
+    product_name  VARCHAR(100),
+    unit_price    DECIMAL(10,2),
+    quantity      INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   600 Query	CREATE TABLE clients (
+    client_id   INT NOT NULL,
+    client_name VARCHAR(100) NOT NULL,
+    client_city VARCHAR(100) NOT NULL,
+    PRIMARY KEY (client_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   600 Query	CREATE TABLE products (
+    product_id   INT NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    unit_price   DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   600 Query	CREATE TABLE sales (
+    sale_id    INT NOT NULL,
+    sale_date  DATE NOT NULL,
+    client_id  INT NOT NULL,
+    PRIMARY KEY (sale_id),
+    CONSTRAINT fk_sales_client FOREIGN KEY (client_id)
+        REFERENCES clients (client_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   600 Query	CREATE TABLE sale_items (
+    sale_id    INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity   INT NOT NULL,
+    PRIMARY KEY (sale_id, product_id),
+    CONSTRAINT fk_items_sale    FOREIGN KEY (sale_id)
+        REFERENCES sales (sale_id),
+    CONSTRAINT fk_items_product FOREIGN KEY (product_id)
+        REFERENCES products (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   600 Query	SHOW TABLES
+		   601 Query	SELECT DATABASE()
+		   601 Init DB	sales_norm
+		   601 Query	INSERT INTO sales_unnormalized VALUES
+(5001, '2026-11-01', 101, 'Иванов Иван',     'Москва',           201, 'Монитор',    15000.00, 2),
+(5001, '2026-11-01', 101, 'Иванов Иван',     'Москва',           202, 'Клавиатура',  2000.00, 1),
+(5002, '2026-11-02', 102, 'Петрова Мария',   'Санкт-Петербург', 203, 'Мышь',        1000.00, 3),
+(5002, '2026-11-02', 102, 'Петрова Мария',   'Санкт-Петербург', 204, 'Наушники',    3500.00, 1),
+(5003, '2026-11-03', 101, 'Иванов Иван',     'Москва',           205, 'Колонки',     2500.00, 2),
+(5004, '2026-11-04', 103, 'Сидоров Алексей', 'Казань',           202, 'Клавиатура',  2000.00, 5),
+(5004, '2026-11-04', 103, 'Сидоров Алексей', 'Казань',           203, 'Мышь',        1000.00, 2),
+(5005, '2026-11-05', 102, 'Петрова Мария',   'Санкт-Петербург', 201, 'Монитор',    15000.00, 1),
+(5006, '2026-11-06', 103, 'Сидоров Алексей', 'Казань',           204, 'Наушники',    3500.00, 2),
+(5006, '2026-11-06', 103, 'Сидоров Алексей', 'Казань',           205, 'Колонки',     2500.00, 1)
+		   601 Query	SELECT * FROM sales_unnormalized ORDER BY sale_id, product_id
+		   602 Query	SELECT DATABASE()
+		   602 Init DB	sales_norm
+		   602 Query	INSERT INTO clients (client_id, client_name, client_city)
+SELECT DISTINCT client_id, client_name, client_city
+FROM sales_unnormalized
+		   602 Query	INSERT INTO products (product_id, product_name, unit_price)
+SELECT DISTINCT product_id, product_name, unit_price
+FROM sales_unnormalized
+		   602 Query	INSERT INTO sales (sale_id, sale_date, client_id)
+SELECT DISTINCT sale_id, sale_date, client_id
+FROM sales_unnormalized
+		   602 Query	INSERT INTO sale_items (sale_id, product_id, quantity)
+SELECT sale_id, product_id, quantity
+FROM sales_unnormalized
+		   602 Query	SELECT * FROM clients
+		   602 Query	SELECT * FROM products
+		   602 Query	SELECT * FROM sales
+		   602 Query	SELECT * FROM sale_items
+		   602 Query	SELECT SUM(unit_price * quantity) AS total_old
+FROM sales_unnormalized
+		   602 Query	SELECT SUM(p.unit_price * si.quantity) AS total_new
+FROM sale_items si
+JOIN products p ON si.product_id = p.product_id
+		   602 Query	SELECT COUNT(DISTINCT sale_id) AS old_sales FROM sales_unnormalized
+		   602 Query	SELECT COUNT(*) AS new_sales FROM sales
+		   602 Query	SELECT COUNT(*) AS old_clients FROM
+    (SELECT DISTINCT client_id FROM sales_unnormalized) AS t
+		   602 Query	SELECT COUNT(*) AS new_clients FROM clients
+		   602 Query	SELECT COUNT(*) AS old_products FROM
+    (SELECT DISTINCT product_id FROM sales_unnormalized) AS t
+		   602 Query	SELECT COUNT(*) AS new_products FROM products
+		   602 Query	SELECT COUNT(*) AS old_items FROM sales_unnormalized
+		   602 Query	SELECT COUNT(*) AS new_items FROM sale_items
+		   602 Query	SELECT c.client_id, c.client_name,
+       SUM(p.unit_price * si.quantity) AS total
+FROM clients c
+JOIN sales s       ON c.client_id = s.client_id
+JOIN sale_items si ON s.sale_id = si.sale_id
+JOIN products p    ON si.product_id = p.product_id
+WHERE c.client_id = 101
+GROUP BY c.client_id, c.client_name
+		   602 Query	SELECT c.client_id, c.client_name,
+       SUM(p.unit_price * si.quantity) AS total
+FROM clients c
+JOIN sales s       ON c.client_id = s.client_id
+JOIN sale_items si ON s.sale_id = si.sale_id
+JOIN products p    ON si.product_id = p.product_id
+GROUP BY c.client_id, c.client_name
+ORDER BY c.client_id
+		   602 Query	START TRANSACTION
+		   602 Query	UPDATE sales_unnormalized
+SET client_city = 'Сочи'
+WHERE sale_id = 5001
+		   602 Query	SELECT DISTINCT client_id, client_city
+FROM sales_unnormalized
+WHERE client_id = 101
+		   602 Query	UPDATE clients SET client_city = 'Сочи' WHERE client_id = 101
+		   602 Query	SELECT client_id, client_name, client_city FROM clients WHERE client_id = 101
+		   602 Query	DELETE FROM sales_unnormalized WHERE sale_id IN (5004, 5006)
+		   602 Query	SELECT * FROM sales_unnormalized WHERE client_id = 103
+		   602 Query	SELECT * FROM clients WHERE client_id = 103
+		   602 Query	DELETE FROM sale_items WHERE sale_id IN (5004, 5006)
+		   602 Query	DELETE FROM sales WHERE sale_id IN (5004, 5006)
+		   602 Query	SELECT * FROM clients WHERE client_id = 103
+		   602 Query	INSERT INTO sales_unnormalized (client_id, client_name, client_city)
+VALUES (104, 'Новый клиент', 'Тверь')
+		   602 Query	SELECT * FROM sales_unnormalized WHERE client_id = 104
+		   602 Query	INSERT INTO clients (client_id, client_name, client_city)
+VALUES (104, 'Новый клиент', 'Тверь')
+		   602 Query	SELECT * FROM clients WHERE client_id = 104
+		   602 Query	ROLLBACK
+		   602 Query	DROP TABLE sales_unnormalized
+		   602 Query	SHOW TABLES

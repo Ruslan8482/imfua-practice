@@ -1,0 +1,132 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   607 Query	DROP DATABASE IF EXISTS hr_sales_norm
+		   607 Query	CREATE DATABASE IF NOT EXISTS hr_sales_norm
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   607 Query	SELECT DATABASE()
+		   607 Init DB	hr_sales_norm
+		   607 Query	DROP TABLE IF EXISTS employee_sales
+		   607 Query	DROP TABLE IF EXISTS reporting_months
+		   607 Query	DROP TABLE IF EXISTS employees
+		   607 Query	DROP TABLE IF EXISTS departments
+		   607 Query	DROP TABLE IF EXISTS employee_sales_unnormalized
+		   607 Query	CREATE TABLE employee_sales_unnormalized (
+    employee_id     INT,
+    employee_name   VARCHAR(100),
+    sale_month      VARCHAR(7),
+    sales_amount    DECIMAL(12,2),
+    department_id   INT,
+    department_name VARCHAR(100)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   607 Query	CREATE TABLE departments (
+    department_id   INT NOT NULL,
+    department_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (department_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   607 Query	CREATE TABLE employees (
+    employee_id   INT NOT NULL,
+    employee_name VARCHAR(100) NOT NULL,
+    department_id INT NOT NULL,
+    PRIMARY KEY (employee_id),
+    CONSTRAINT fk_employees_department FOREIGN KEY (department_id)
+        REFERENCES departments (department_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   607 Query	CREATE TABLE reporting_months (
+    month_id    VARCHAR(7) NOT NULL,
+    month_label VARCHAR(7) NOT NULL,
+    PRIMARY KEY (month_id),
+    CONSTRAINT uq_reporting_months_label UNIQUE (month_label)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   607 Query	CREATE TABLE employee_sales (
+    employee_id  INT NOT NULL,
+    month_id     VARCHAR(7) NOT NULL,
+    sales_amount DECIMAL(12,2) NOT NULL,
+    PRIMARY KEY (employee_id, month_id),
+    CONSTRAINT fk_sales_employee FOREIGN KEY (employee_id)
+        REFERENCES employees (employee_id),
+    CONSTRAINT fk_sales_month FOREIGN KEY (month_id)
+        REFERENCES reporting_months (month_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   607 Query	SHOW TABLES
+		   608 Query	SELECT DATABASE()
+		   608 Init DB	hr_sales_norm
+		   608 Query	INSERT INTO employee_sales_unnormalized VALUES
+(1, 'Иванов Иван',     '2026-01', 120000.00, 10, 'Отдел реализации'),
+(1, 'Иванов Иван',     '2026-02', 150000.00, 10, 'Отдел реализации'),
+(2, 'Петрова Мария',   '2026-01',  90000.00, 20, 'Отдел развития'),
+(2, 'Петрова Мария',   '2026-02', 110000.00, 20, 'Отдел развития'),
+(3, 'Сидоров Алексей', '2026-01',  80000.00, 30, 'Отдел экспорта'),
+(3, 'Сидоров Алексей', '2026-02',  95000.00, 30, 'Отдел экспорта'),
+(4, 'Кузнецова Анна',  '2026-02',  70000.00, 10, 'Отдел реализации')
+		   608 Query	SELECT * FROM employee_sales_unnormalized ORDER BY employee_id, sale_month
+		   609 Query	SELECT DATABASE()
+		   609 Init DB	hr_sales_norm
+		   609 Query	INSERT INTO departments (department_id, department_name)
+SELECT DISTINCT department_id, department_name
+FROM employee_sales_unnormalized
+		   609 Query	INSERT INTO employees (employee_id, employee_name, department_id)
+SELECT DISTINCT employee_id, employee_name, department_id
+FROM employee_sales_unnormalized
+		   609 Query	INSERT INTO reporting_months (month_id, month_label)
+SELECT DISTINCT sale_month, sale_month
+FROM employee_sales_unnormalized
+		   609 Query	INSERT INTO employee_sales (employee_id, month_id, sales_amount)
+SELECT s.employee_id, m.month_id, s.sales_amount
+FROM employee_sales_unnormalized s
+JOIN reporting_months m ON m.month_label = s.sale_month
+		   609 Query	SELECT * FROM departments
+		   609 Query	SELECT * FROM employees
+		   609 Query	SELECT * FROM reporting_months
+		   609 Query	SELECT * FROM employee_sales
+		   609 Query	SELECT SUM(sales_amount) AS total_old
+FROM employee_sales_unnormalized
+		   609 Query	SELECT SUM(es.sales_amount) AS total_new
+FROM employee_sales es
+		   609 Query	SELECT COUNT(*) AS old_departments FROM
+    (SELECT DISTINCT department_id FROM employee_sales_unnormalized) AS t
+		   609 Query	SELECT COUNT(*) AS new_departments FROM departments
+		   609 Query	SELECT COUNT(*) AS old_employees FROM
+    (SELECT DISTINCT employee_id FROM employee_sales_unnormalized) AS t
+		   609 Query	SELECT COUNT(*) AS new_employees FROM employees
+		   609 Query	SELECT COUNT(*) AS old_months FROM
+    (SELECT DISTINCT sale_month FROM employee_sales_unnormalized) AS t
+		   609 Query	SELECT COUNT(*) AS new_months FROM reporting_months
+		   609 Query	SELECT COUNT(*) AS old_sales FROM employee_sales_unnormalized
+		   609 Query	SELECT COUNT(*) AS new_sales FROM employee_sales
+		   609 Query	SELECT e.employee_id, e.employee_name, SUM(es.sales_amount) AS total
+FROM employees e
+JOIN employee_sales es ON e.employee_id = es.employee_id
+WHERE e.employee_id = 1
+GROUP BY e.employee_id, e.employee_name
+		   609 Query	SELECT d.department_id, d.department_name, SUM(es.sales_amount) AS total
+FROM departments d
+JOIN employees e       ON d.department_id = e.department_id
+JOIN employee_sales es ON e.employee_id = es.employee_id
+GROUP BY d.department_id, d.department_name
+ORDER BY d.department_id
+		   609 Query	START TRANSACTION
+		   609 Query	UPDATE employee_sales_unnormalized
+SET department_name = 'Отдел продаж'
+WHERE employee_id = 1 AND sale_month = '2026-01'
+		   609 Query	SELECT DISTINCT department_id, department_name
+FROM employee_sales_unnormalized
+WHERE department_id = 10
+		   609 Query	UPDATE departments SET department_name = 'Отдел продаж' WHERE department_id = 10
+		   609 Query	SELECT * FROM departments WHERE department_id = 10
+		   609 Query	DELETE FROM employee_sales_unnormalized WHERE employee_id = 4
+		   609 Query	SELECT * FROM employee_sales_unnormalized WHERE employee_id = 4
+		   609 Query	SELECT * FROM employees WHERE employee_id = 4
+		   609 Query	SELECT * FROM departments WHERE department_id = 10
+		   609 Query	DELETE FROM employee_sales WHERE employee_id = 4
+		   609 Query	SELECT * FROM employees WHERE employee_id = 4
+		   609 Query	INSERT INTO employee_sales_unnormalized (department_id, department_name)
+VALUES (99, 'Отдел качества')
+		   609 Query	SELECT * FROM employee_sales_unnormalized WHERE department_id = 99
+		   609 Query	INSERT INTO departments (department_id, department_name)
+VALUES (99, 'Отдел качества')
+		   609 Query	SELECT * FROM departments WHERE department_id = 99
+		   609 Query	ROLLBACK
+		   609 Query	DROP TABLE employee_sales_unnormalized
+		   609 Query	SHOW TABLES

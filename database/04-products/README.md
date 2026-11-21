@@ -1,19 +1,29 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Products.md)
+
 # Лабораторная 04 — основные операции на примере `products 1` и `products 2`
 
 > **Оригинал:** [Products.md](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Products.md)
 >
-> **Внимание:** в этой среде нет Docker/MySQL. Реальные логи, дампы и скриншоты
-> создаются при запуске на машине с Docker. Плейсхолдеры `<вставьте …>` и ссылки
-> `evidence/*.png` в шаблоне заполняются после выполнения.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt)
+> и дампы в `artifacts/`. Скриншоты в `evidence/` не создавались (нет GUI).
 
-## Цель
+## 🎯 Цель
 
 На практике выполнить реляционные операции над таблицами `products1` и `products2`
 базы `shop`: выборку, проекцию, `UNION`, разность (`EXCEPT`), пересечение
 (`INTERSECT`), декартово произведение (`CROSS JOIN`) и соединения (`JOIN`,
 `LEFT JOIN`); сделать дамп, удалить и восстановить БД.
 
-## Используемый образ и контейнер
+## 🧰 Используемый образ и контейнер
 
 - Образ из инструкции: `mysql:latest` (нужен MySQL **8.0.31+** для `EXCEPT`/`INTERSECT`;
   для старых версий в SQL-файле есть альтернативы). Контейнер здесь —
@@ -23,7 +33,7 @@
   помимо кодировки включает `general_log`, поэтому лог действий выгружается и для
   этой лабораторной.
 
-## Ход выполнения
+## 📋 Ход выполнения
 
 ### Шаг 1. Подготовка и БД
 
@@ -162,40 +172,83 @@ SELECT * FROM products2;
 
 Полная последовательность — в [commands.sh](commands.sh).
 
-## Результаты
+## 📊 Результаты
 
-**Ожидаемые результаты запросов:**
+Все шесть SQL-файлов выполнены с кодом возврата 0, ошибок в выводе нет
+(см. [RESULT.txt](artifacts/RESULT.txt)).
+
+**Исходные таблицы (факт):**
+
+```text
+name	price
+Дыни	800
+Клубника	150
+Яблоки	120
+Лимоны	200
+name	price
+Дыни	800
+Клубника	150
+Каштаны	200
+Хурма	350
+```
+
+**Операции (факт из `03_queries.sql`):**
 
 - `WHERE price > 150` → `Дыни 800`, `Лимоны 200`.
-- `UNION` → 6 уникальных названий: Дыни, Клубника, Яблоки, Лимоны, Каштаны, Хурма.
+- Проекция `SELECT name FROM products1` → 4 названия.
+- `UNION` → 6 строк: Дыни, Клубника, Яблоки, Лимоны, Каштаны, Хурма.
 - `EXCEPT` → `Яблоки 120`, `Лимоны 200`.
 - `INTERSECT` → `Дыни 800`, `Клубника 150`.
 - `CROSS JOIN` → 16 строк; `JOIN` → 2 строки; `LEFT JOIN` → 4 строки
   (для Яблоки/Лимоны `price2 = NULL`).
 
-**Фактический вывод (заполнить):**
-
 ```text
-<вставьте вывод SELECT * FROM products1/products2>
-<вставьте вывод UNION / EXCEPT / INTERSECT / CROSS JOIN / JOIN / LEFT JOIN>
-<вставьте вывод SHOW TABLES и SELECT после восстановления БД>
+name1	price1	name2	price2
+Дыни	800	Дыни	800
+Клубника	150	Дыни	800
+Яблоки	120	Дыни	800
+Лимоны	200	Дыни	800
+Дыни	800	Клубника	150
+Клубника	150	Клубника	150
+Яблоки	120	Клубника	150
+Лимоны	200	Клубника	150
+Дыни	800	Каштаны	200
+Клубника	150	Каштаны	200
+Яблоки	120	Каштаны	200
+Лимоны	200	Каштаны	200
+Дыни	800	Хурма	350
+Клубника	150	Хурма	350
+Яблоки	120	Хурма	350
+Лимоны	200	Хурма	350
+name	price1	price2
+Дыни	800	800
+Клубника	150	150
+name	price1	price2
+Дыни	800	800
+Клубника	150	150
+Яблоки	120	NULL
+Лимоны	200	NULL
 ```
 
-![Таблицы products1 и products2](evidence/01-products-tables.png)
-![Разность и пересечение](evidence/02-except-intersect.png)
-![JOIN и CROSS JOIN](evidence/03-joins.png)
-![Восстановленная БД shop](evidence/04-restore.png)
+**Удаление и восстановление (факт):** `04_drop.sql` — `shop` был в `SHOW DATABASES`,
+`tables products1/products2`, после `DROP DATABASE shop` базы в списке нет;
+`04_restore.sql` и `04_verify.sql` — `shop` снова в списке, таблицы `products1`
+и `products2` на месте, по 4 строки в каждой. Кириллица в выводе корректная:
+клиент запускается с `--default-character-set=utf8mb4`, полный вывод — в
+[execution-output.txt](artifacts/execution-output.txt).
 
-## Лог и дамп
+Скриншоты в `evidence/` не создавались (нет GUI).
 
-- `artifacts/general.log` — сырой лог MySQL (в инструкции — `general.log`).
-- `artifacts/my_actions.log` — отфильтрованный лог действий.
-- `artifacts/shop-dump.sql` — дамп БД `shop` (в инструкции — `dump.sql`).
+## 📎 Доказательства выполнения
 
-![Лог действий](evidence/05-log.png)
-![Дамп shop](evidence/06-dump.png)
+- [artifacts/general.log](artifacts/general.log) — сырой `general.log` MariaDB (9102 байт).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованный лог действий (165 строк).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — полный вывод шести SQL-скриптов (3050 байт).
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — сводка прогона: коды возврата 0, 0 ошибок.
+- [artifacts/shop-dump.sql](artifacts/shop-dump.sql) — дамп БД `shop` (2674 байт).
+- [artifacts/shop-pre-drop-dump.sql](artifacts/shop-pre-drop-dump.sql) — дамп перед удалением БД (2450 байт).
 
-## Чек-лист сдачи
+## ✅ Чек-лист сдачи
 
 - [ ] Контейнер поднят с `mysql:latest` (MySQL 8.0.31+), кодировка utf8mb4.
 - [ ] БД `shop`, таблицы `products1` и `products2` созданы и заполнены.
@@ -205,3 +258,5 @@ SELECT * FROM products2;
 - [ ] Лог выгружен и отфильтрован, дамп не пуст.
 - [ ] Скриншоты добавлены в `evidence/`, отчёт заполнен.
 - [ ] Изменения зафиксированы локально; push не выполняется.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

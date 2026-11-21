@@ -1,0 +1,107 @@
+===== BEGIN 01_schema.sql =====
+Variable_name	Value
+character_set_client	utf8mb4
+character_set_collations	
+character_set_connection	utf8mb4
+character_set_database	utf8mb4
+character_set_filesystem	binary
+character_set_results	utf8mb4
+character_set_server	utf8mb4
+character_set_system	utf8mb3
+character_sets_dir	/usr/local/mysql/share/charsets/
+Database
+alias_db
+fulltext_practice
+hr_sales_norm
+index_practice
+information_schema
+join_practice
+mysql
+orders_class_norm
+orders_rep_norm
+performance_schema
+sales
+sales_norm
+shop
+shop_norm
+sort_practice
+sql_practice
+sys
+Tables_in_my_database
+users
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+id	name	email
+1	Иван Иванов	ivan@example.com
+2	Пётр Петров	petr@example.com
+3	Мария Сидорова	maria@example.com
+id	name	email
+1	Иван Иванов	ivan@example.com
+2	Пётр Петров	petr@example.com
+3	Мария Сидорова	maria@example.com
+name	HEX(name)
+Иван Иванов	D098D0B2D0B0D0BD20D098D0B2D0B0D0BDD0BED0B2
+id	name	email
+1	Иван Иванов	ivan@example.com
+2	Пётр Петров	petr@example.com
+3	Мария Сидорова	maria@example.com
+4	Павел Иванов	pavel@example.com
+5	Марк Аврелий	mark@example.com
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+id	name	email
+1	Vasya	ivan@example.com
+2	Пётр Петров	petr@example.com
+3	Мария Сидорова	maria@example.com
+4	Павел Иванов	pavel@example.com
+5	Марк Аврелий	mark@example.com
+id	name	email
+1	Vasya	ivan@example.com
+name	email
+Vasya	ivan@example.com
+Пётр Петров	petr@example.com
+Мария Сидорова	maria@example.com
+Павел Иванов	pavel@example.com
+Марк Аврелий	mark@example.com
+name
+Vasya
+Пётр Петров
+Мария Сидорова
+Павел Иванов
+Марк Аврелий
+name	email
+Vasya	ivan@example.com
+===== END 03_queries.sql : exit=0 =====
+===== BEGIN 04_cleanup.sql =====
+Tables_in_my_database
+users
+id	name	email
+1	Vasya	ivan@example.com
+2	Пётр Петров	petr@example.com
+3	Мария Сидорова	maria@example.com
+4	Павел Иванов	pavel@example.com
+5	Марк Аврелий	mark@example.com
+id	name	email
+1	Vasya	ivan@example.com
+3	Мария Сидорова	maria@example.com
+4	Павел Иванов	pavel@example.com
+5	Марк Аврелий	mark@example.com
+Database
+alias_db
+fulltext_practice
+hr_sales_norm
+index_practice
+information_schema
+join_practice
+mysql
+orders_class_norm
+orders_rep_norm
+performance_schema
+sales
+sales_norm
+shop
+shop_norm
+sort_practice
+sql_practice
+sys
+===== END 04_cleanup.sql : exit=0 =====

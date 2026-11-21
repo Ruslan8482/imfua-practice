@@ -1,8 +1,16 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/DevOps/CI_CD/Pipelines/HexLoader.md)
+
 # Hex Loader → GitHub Releases (`cd-hexloader-bin.yml`)
 
 Источник: [HexLoader.md](https://github.com/rurewa/imfua/blob/main/content/DevOps/CI_CD/Pipelines/HexLoader.md)
 
-## Что делает пайплайн
+## 🎯 Что делает пайплайн
 
 1. Запускается по тегу `v*` (или вручную).
 2. Проверяет логику разбора Intel HEX тестами и `go vet`.
@@ -10,7 +18,7 @@
 4. Динамически ищет `gcc.exe` в MSYS2.
 5. Публикует бинарники в GitHub Release.
 
-## Локальный запуск
+## 📋 Локальный запуск
 
 ```bash
 go mod tidy
@@ -18,8 +26,10 @@ go test ./...
 go run .
 ```
 
-## Скриншот
+## 📸 Скриншот
 
 ![Скриншот окна Hex Loader](evidence/app.png)
 
 > Placeholder: положите реальный скриншот окна приложения в `evidence/app.png`.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

@@ -1,21 +1,30 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Aliases.md)
+
 # Лабораторная 11 — алиасы в MySQL
 
 **Оригинал:** [Aliases.md — Учебное руководство по алиасам в SQL (с созданием БД и логированием)](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Aliases.md)  
 Локальная копия инструкции (только для чтения): `/tmp/opencode/imfua-src/content/Courses/Basics_database_design/content/bd/Aliases.md`
 
-> ⚠️ **Статус отчёта.** В этой среде нет Docker/MySQL, поэтому реальные `general.log`,
-> `my_actions.log`, дампы и скриншоты **не генерируются здесь** — они создаются при
-> запуске на вашей машине (WSL / Git-Bash + Docker CLI). Ниже — готовый шаблон отчёта:
-> заполните `<...>` реальными значениями и вставьте снимки в `evidence/`.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt)
+> и дампы в `artifacts/`. Скриншоты в `evidence/` не создавались (нет GUI).
 
-## Цель
+## 🎯 Цель
 
 Освоить алиасы таблиц и столбцов, понять порядок выполнения запроса и зоны видимости
 алиаса (`WHERE` — нельзя, `ORDER BY` — можно, `GROUP BY`/`HAVING` — можно в MySQL),
 научиться использовать алиасы в самосоединениях, производных таблицах и подзапросах,
 а также вести и фильтровать `general.log` и делать дамп базы `alias_db`.
 
-## Состав каталога
+## 🧰 Состав каталога
 
 | Файл | Что делает |
 |------|------------|
@@ -26,7 +35,7 @@
 | `commands.sh` | `docker run`, очистка лога, вызов SQL, `export-log.sh`, `dump-db.sh` |
 | `artifacts/.gitkeep`, `evidence/.gitkeep` | Пустые каталоги для артефактов и скриншотов |
 
-## Пошаговое выполнение
+## 📋 Пошаговое выполнение
 
 ```bash
 cd imfua-practice
@@ -76,33 +85,43 @@ docker exec -u mysql imfua-11-aliases sh -c ': > /var/lib/mysql/general.log'   #
 ошибочные — в `03_queries.sql` они оставлены комментариями с пометкой
 `НЕ ВЫПОЛНЯТЬ`, рядом даны исправленные варианты.
 
-## Результаты: EXPLAIN «до/после»
+## 📊 Результаты: EXPLAIN «до/после»
 
-Алиасы не меняют план: запрос из раздела 2 без алиасов и тот же запрос с алиасами
-должны дать одинаковые `type`/`rows`/`Extra`. Заполните таблицу реальными значениями
-из вашего `EXPLAIN` (скриншоты — в `evidence/`).
+Алиасы не меняют план: запрос без алиасов и тот же запрос с алиасами дают одинаковые
+`type`/`rows`/`Extra` (значения ниже — из реального [execution-output.txt](artifacts/execution-output.txt)).
 
 | № | Запрос | До (aliases нет): `type / rows / Extra` | После (с алиасами): `type / rows / Extra` |
 |---|--------|------------------------------------------|-------------------------------------------|
-| 1 | `EXPLAIN SELECT customers.name, orders.order_date, orders.amount FROM customers JOIN orders ON customers.id = orders.customer_id;` | `<type>` / `<rows>` / `<Extra>` | `<type>` / `<rows>` / `<Extra>` |
-| 2 | `EXPLAIN SELECT c.name, o.order_date, o.amount FROM customers c JOIN orders o ON c.id = o.customer_id;` | `<type>` / `<rows>` / `<Extra>` | `<type>` / `<rows>` / `<Extra>` |
-| 3 | `EXPLAIN SELECT c.name ... JOIN (SELECT customer_id, SUM(amount) AS total FROM orders GROUP BY customer_id) o ...` | `<type>` / `<rows>` / `<Extra>` | `<type>` / `<rows>` / `<Extra>` |
+| 1 | `EXPLAIN SELECT customers.name, orders.order_date, orders.amount FROM customers JOIN orders ON customers.id = orders.customer_id;` | `orders: ALL / 6 / —; customers: eq_ref / 1 / —` | `orders: ALL / 6 / —; customers: eq_ref / 1 / —` |
+| 2 | `EXPLAIN SELECT c.name, o.order_date, o.amount FROM customers c JOIN orders o ON c.id = o.customer_id;` | `o: ALL / 6 / —; c: eq_ref / 1 / —` | `o: ALL / 6 / —; c: eq_ref / 1 / —` |
+| 3 | `EXPLAIN SELECT c.name ... JOIN (SELECT customer_id, SUM(amount) AS total FROM orders GROUP BY customer_id) o ...` | полный вывод смотри в [execution-output.txt](artifacts/execution-output.txt) (EXPLAIN для этого запроса в выводе отсутствует) | полный вывод смотри в [execution-output.txt](artifacts/execution-output.txt) |
 
-Ожидаемая интерпретация: `type = <ref/ALL/index>`, `rows = <...>`, `Extra = <...>`;
-главное — различий между «до» и «после» нет, меняется только читаемость SQL.
+Интерпретация по реальному выводу: внешняя таблица (`orders`/`o`) читается `ALL`, `rows = 6`;
+внутренняя (`customers`/`c`) — `eq_ref` по `PRIMARY`, `rows = 1`, `Extra` пустое. Планы
+идентичны, меняется только читаемость SQL.
 
-Дополнительно проверьте результаты запросов (впишите реальные значения):
+Дополнительные проверки (реальные значения из [execution-output.txt](artifacts/execution-output.txt)):
 
 | Проверка | Ожидаемый результат | Фактический результат |
 |----------|---------------------|------------------------|
-| `SELECT * FROM customers;` | 5 строк | `<вставить>` |
-| `SELECT * FROM orders;` | 6 строк | `<вставить>` |
-| `SELECT * FROM employees;` | 6 строк, у Анны Петровой `manager_id = NULL` | `<вставить>` |
-| Самосоединение `e/m` | 5 пар «сотрудник — руководитель» | `<вставить>` |
-| `ORDER BY double_amount DESC` | 6 заказов, максимум `4200.00 * 2` | `<вставить>` |
-| `SELECT * FROM (...) AS t` | 4 строки с `customer_id, total` | `<вставить>` |
+| `SELECT * FROM customers;` | 5 строк | 5 строк: `1 Иван Иванов`, `2 Пётр Петров`, `3 Мария Сидорова`, `4 Алексей Смирнов`, `5 Ольга Кузнецова` |
+| `SELECT * FROM orders;` | 6 строк | 6 строк (id 1–6): `1500.00`, `2300.50`, `800.00`, `4200.00`, `1100.00`, `950.00` |
+| `SELECT * FROM employees;` | 6 строк, у Анны Петровой `manager_id = NULL` | 6 строк: `1 Анна Петрова Генеральный директор NULL`, `2 Игорь Смирнов … 1`, `3 Елена Кузнецова … 1`, `4 Дмитрий Орлов … 3`, `5 Ольга Зайцева … 3`, `6 Сергей Волков … 2` |
+| Самосоединение `e/m` | 5 пар «сотрудник — руководитель» | 5 пар: Игорь Смирнов—Анна Петрова, Елена Кузнецова—Анна Петрова, Дмитрий Орлов—Елена Кузнецова, Ольга Зайцева—Елена Кузнецова, Сергей Волков—Игорь Смирнов |
+| `ORDER BY double_amount DESC` | 6 заказов, максимум `4200.00 * 2` | 6 заказов: `4 → 8400.00`, `2 → 4601.00`, `1 → 3000.00`, `5 → 2200.00`, `6 → 1900.00`, `3 → 1600.00` |
+| `SELECT * FROM (...) AS t` | 4 строки с `customer_id, total` | 4 строки: `1 → 3800.50`, `2 → 800.00`, `3 → 5300.00`, `4 → 950.00` |
 
-## Места под скриншоты (создаются при запуске)
+## 📎 Доказательства выполнения
+
+- [artifacts/general.log](artifacts/general.log) — полный general-лог MariaDB 11.4.14 (5715 байт).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованный лог выполненных SQL-команд (142 строки).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — реальный вывод `01_schema.sql`, `02_seed.sql`, `03_queries.sql`.
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — коды возврата `0, 0, 0`, ошибок 0.
+- [artifacts/alias_db-dump.sql](artifacts/alias_db-dump.sql) — дамп базы `alias_db` (5230 байт).
+
+Скриншоты в `evidence/` не создавались (нет GUI); их роль выполняют логи и вывод запросов.
+
+## 📸 Места под скриншоты (создаются при запуске)
 
 | Файл | Что фотографируем |
 |------|--------------------|
@@ -115,29 +134,30 @@ docker exec -u mysql imfua-11-aliases sh -c ': > /var/lib/mysql/general.log'   #
 
 > Файлы в `evidence/` игнорируются Git; коммитится только `evidence/.gitkeep`.
 
-## Артефакты
+## 📎 Артефакты
 
-Цепочка: `general.log` (внутри контейнера `/var/lib/mysql/general.log`)
+Цепочка: general-лог локального MariaDB 11.4.14
 → `artifacts/general.log` (полный) → `artifacts/my_actions.log` (только ваши действия).
 
 | Путь | Содержимое | Статус |
 |------|------------|--------|
-| `artifacts/general.log` | Копия полного general.log (`docker cp`) | Создаётся при запуске |
-| `artifacts/my_actions.log` | Отфильтрованный лог (`CREATE/INSERT/SELECT/UPDATE/...`, без `Connect`, `Quit`, `SET NAMES`, help/time_zone) | Создаётся при запуске |
-| `artifacts/alias_db-dump.sql` | Дамп базы `alias_db` с таблицами `customers`, `orders`, `employees` | Создаётся при запуске |
-| `database/logs/11-aliases-actions.log` | Копия отфильтрованного лога | Создаётся при запуске |
-| `database/dumps/11-aliases-alias_db-dump.sql` | Копия дампа | Создаётся при запуске |
+| `artifacts/general.log` | Копия полного general-лога (5715 байт) | Есть |
+| `artifacts/my_actions.log` | Отфильтрованный лог (`CREATE/INSERT/SELECT/UPDATE/...`, без `Connect`, `Quit`, `SET NAMES`, help/time_zone), 142 строки | Есть |
+| `artifacts/execution-output.txt` | Реальный вывод всех трёх SQL-скриптов | Есть |
+| `artifacts/RESULT.txt` | Сводка: коды возврата `0, 0, 0`, ошибок 0 | Есть |
+| `artifacts/alias_db-dump.sql` | Дамп базы `alias_db` с таблицами `customers`, `orders`, `employees` (5230 байт) | Есть |
 
-В репозитории лежат только `artifacts/.gitkeep` и `evidence/.gitkeep`; реальные логи,
-дампы и PNG появляются на машине с Docker/MySQL и в Git не коммитятся.
+Перечисленные файлы реально находятся в `artifacts/`; `evidence/` содержит только `.gitkeep`
+(скриншоты не создавались, нет GUI).
 
-## Чек-лист сдачи
+## ✅ Чек-лист сдачи
 
-- [ ] Контейнер `imfua-11-aliases` поднят с `my.cnf` без BOM/LF-переводов.
-- [ ] Лог очищен **до** начала работы (`-u mysql`).
-- [ ] Выполнены все три SQL-файла; ошибочные примеры остались комментариями.
-- [ ] Таблица EXPLAIN «до/после» заполнена реальными `type`, `rows`, `Extra`.
-- [ ] Скриншоты добавлены в `evidence/` (не коммитятся, но есть локально).
-- [ ] `artifacts/my_actions.log` содержит только осмысленные SQL-команды.
-- [ ] `artifacts/alias_db-dump.sql` содержит три таблицы с данными.
+- [x] Локальный MariaDB 11.4.14 запущен с `my.cnf` без BOM/LF-переводов (Docker не использовался).
+- [x] Выполнены все три SQL-файла (коды возврата `0, 0, 0`); ошибочные примеры остались комментариями.
+- [x] Таблица EXPLAIN «до/после» заполнена реальными `type`, `rows`, `Extra`.
+- [ ] Скриншоты в `evidence/` не создавались (нет GUI); вместо них логи и `execution-output.txt`.
+- [x] `artifacts/my_actions.log` содержит только осмысленные SQL-команды.
+- [x] `artifacts/alias_db-dump.sql` содержит три таблицы с данными.
 - [ ] Ссылка на отчёт отправлена преподавателю; `push` не выполняется.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

@@ -1,3 +1,11 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/CloudBeaver.md)
+
 # 09. CloudBeaver (Docker Compose)
 
 > **Важно:** в среде preparation Docker отсутствует. Конфигурация проверена статически,
@@ -6,7 +14,7 @@
 - Оригинал: [CloudBeaver.md](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/CloudBeaver.md)
 - Локальная копия источника: `/tmp/opencode/imfua-src/content/Docker/DockerCompose/CloudBeaver.md`
 
-## Состав сервисов
+## 🧰 Состав сервисов
 
 | Сервис | Образ | Порт хоста | Назначение |
 |---|---|---|---|
@@ -16,7 +24,7 @@
 - Дополнительно `./logs:/opt/cloudbeaver/logs` (как в апстрим-композе проекта).
 - Сеть `cloudbeaver-network` (bridge). Healthcheck не добавлен: в официальном образе нет гарантированного HTTP-клиента для пробы.
 
-## Пошаговый запуск
+## 📋 Пошаговый запуск
 
 1. Проверьте, что порт 8978 свободен: `docker compose ls`.
 2. Подготовьте окружение:
@@ -31,14 +39,14 @@
 4. При первом входе создайте администратора: имя `cbadmin`, пароль > 8 символов
    с хотя бы одной заглавной и одной строчной буквой (как в источнике).
 
-## Проверка
+## ✅ Проверка
 
 - Статус: `docker compose ps -a`; логи: `docker compose logs cloudbeaver`, `docker compose logs -f cloudbeaver`.
 - Приложение: http://localhost:8978
 - Создайте подключение к тестовой БД и проверьте, что оно сохранилось в `./workspace`.
 - Конфигурация: `docker compose config`.
 
-## Остановка и очистка
+## 🧹 Остановка и очистка
 
 ```bash
 docker compose down
@@ -47,7 +55,7 @@ docker image rm dbeaver/cloudbeaver:latest   # опционально
 # или: bash commands.sh clean
 ```
 
-## Результаты
+## 📊 Результаты
 
 - Дата запуска: `<заполнить при реальном запуске>`
 - Статус сервиса: `<вставить вывод docker compose ps>`
@@ -57,3 +65,5 @@ docker image rm dbeaver/cloudbeaver:latest   # опционально
 Скриншот (замените этот блок реальным файлом, например `evidence/cloudbeaver.png`):
 
 ![Скриншот CloudBeaver](evidence/cloudbeaver.png)
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

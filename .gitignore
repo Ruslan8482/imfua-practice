@@ -1,14 +1,23 @@
-# Логи и дампы — генерируются при запуске, в Git не попадают
+# Логи и дампы создаются при выполнении заданий; файлы-доказательства коммитятся в artifacts/
+# (скриншоты остаются игнорируемыми)
 *.log
 !database/logs/.gitkeep
+!database/logs/*.log
 **/artifacts/*
 !**/artifacts/.gitkeep
+!**/artifacts/general.log
+!**/artifacts/my_actions.log
+!**/artifacts/execution-output.txt
+!**/artifacts/RESULT.txt
+!**/artifacts/*-dump.sql
+!**/artifacts/*.sql
 database/dumps/*
 !database/dumps/.gitkeep
 **/evidence/*
 !**/evidence/.gitkeep
-*-dump.sql
-dump.sql
+*.png
+*.jpg
+*.jpeg
 
 # Временное
 __pycache__/

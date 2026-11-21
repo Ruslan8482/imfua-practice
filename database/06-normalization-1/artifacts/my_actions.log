@@ -1,0 +1,138 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   593 Query	DROP DATABASE IF EXISTS sales_norm
+		   593 Query	CREATE DATABASE IF NOT EXISTS sales_norm
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   593 Query	SELECT DATABASE()
+		   593 Init DB	sales_norm
+		   593 Query	DROP TABLE IF EXISTS report_items
+		   593 Query	DROP TABLE IF EXISTS reports
+		   593 Query	DROP TABLE IF EXISTS products
+		   593 Query	DROP TABLE IF EXISTS customers
+		   593 Query	DROP TABLE IF EXISTS sales_unnormalized_2
+		   593 Query	CREATE TABLE sales_unnormalized_2 (
+    report_id     INT,
+    report_date   DATE,
+    customer_id   INT,
+    customer_name VARCHAR(100),
+    product_id    INT,
+    product_name  VARCHAR(100),
+    price         DECIMAL(10,2),
+    quantity      INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   593 Query	CREATE TABLE customers (
+    customer_id   INT NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (customer_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   593 Query	CREATE TABLE products (
+    product_id   INT NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    price        DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   593 Query	CREATE TABLE reports (
+    report_id   INT NOT NULL,
+    report_date DATE NOT NULL,
+    customer_id INT NOT NULL,
+    PRIMARY KEY (report_id),
+    CONSTRAINT fk_reports_customer FOREIGN KEY (customer_id)
+        REFERENCES customers (customer_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   593 Query	CREATE TABLE report_items (
+    report_id  INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity   INT NOT NULL,
+    PRIMARY KEY (report_id, product_id),
+    CONSTRAINT fk_items_report  FOREIGN KEY (report_id)
+        REFERENCES reports (report_id),
+    CONSTRAINT fk_items_product FOREIGN KEY (product_id)
+        REFERENCES products (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   593 Query	SHOW TABLES
+		   594 Query	SELECT DATABASE()
+		   594 Init DB	sales_norm
+		   594 Query	INSERT INTO sales_unnormalized_2 VALUES
+(1101, '2026-03-05', 12, 'Дания',   101, 'Дыни',      800, 1100),
+(1101, '2026-03-05', 12, 'Дания',   102, 'Клубника',  150,  300),
+(1102, '2026-03-07', 23, 'Испания', 103, 'Яблоки',    120, 1700),
+(1103, '2026-03-08', 25, 'Албания', 104, 'Лимоны',    200,  500),
+(1104, '2026-03-10', 12, 'Дания',   101, 'Дыни',      800, 2500),
+(1105, '2026-03-12', 25, 'Албания', 103, 'Яблоки',    120, 2000),
+(1105, '2026-03-12', 25, 'Албания', 104, 'Лимоны',    200,  700)
+		   594 Query	SELECT * FROM sales_unnormalized_2 ORDER BY report_id, product_id
+		   595 Query	SELECT DATABASE()
+		   595 Init DB	sales_norm
+		   595 Query	INSERT INTO customers (customer_id, customer_name)
+SELECT DISTINCT customer_id, customer_name
+FROM sales_unnormalized_2
+		   595 Query	INSERT INTO products (product_id, product_name, price)
+SELECT DISTINCT product_id, product_name, price
+FROM sales_unnormalized_2
+		   595 Query	INSERT INTO reports (report_id, report_date, customer_id)
+SELECT DISTINCT report_id, report_date, customer_id
+FROM sales_unnormalized_2
+		   595 Query	INSERT INTO report_items (report_id, product_id, quantity)
+SELECT report_id, product_id, quantity
+FROM sales_unnormalized_2
+		   595 Query	SELECT * FROM customers
+		   595 Query	SELECT * FROM products
+		   595 Query	SELECT * FROM reports
+		   595 Query	SELECT * FROM report_items
+		   595 Query	SELECT SUM(price * quantity) AS total_old
+FROM sales_unnormalized_2
+		   595 Query	SELECT SUM(p.price * ri.quantity) AS total_new
+FROM report_items ri
+JOIN products p ON ri.product_id = p.product_id
+		   595 Query	SELECT COUNT(DISTINCT report_id) AS old_reports FROM sales_unnormalized_2
+		   595 Query	SELECT COUNT(*) AS new_reports FROM reports
+		   595 Query	SELECT COUNT(*) AS old_customers FROM
+    (SELECT DISTINCT customer_id FROM sales_unnormalized_2) AS t
+		   595 Query	SELECT COUNT(*) AS new_customers FROM customers
+		   595 Query	SELECT COUNT(*) AS old_products FROM
+    (SELECT DISTINCT product_id FROM sales_unnormalized_2) AS t
+		   595 Query	SELECT COUNT(*) AS new_products FROM products
+		   595 Query	SELECT COUNT(*) AS old_items FROM sales_unnormalized_2
+		   595 Query	SELECT COUNT(*) AS new_items FROM report_items
+		   595 Query	SELECT c.customer_id, c.customer_name,
+       SUM(p.price * ri.quantity) AS total
+FROM customers c
+JOIN reports r           ON c.customer_id = r.customer_id
+JOIN report_items ri     ON r.report_id = ri.report_id
+JOIN products p          ON ri.product_id = p.product_id
+WHERE c.customer_id = 12
+GROUP BY c.customer_id, c.customer_name
+		   595 Query	SELECT c.customer_id, c.customer_name,
+       SUM(p.price * ri.quantity) AS total
+FROM customers c
+JOIN reports r       ON c.customer_id = r.customer_id
+JOIN report_items ri ON r.report_id = ri.report_id
+JOIN products p      ON ri.product_id = p.product_id
+GROUP BY c.customer_id, c.customer_name
+ORDER BY c.customer_id
+		   595 Query	START TRANSACTION
+		   595 Query	UPDATE sales_unnormalized_2
+SET customer_name = 'Дания (новое имя)'
+WHERE report_id = 1101
+		   595 Query	SELECT DISTINCT customer_id, customer_name
+FROM sales_unnormalized_2
+WHERE customer_id = 12
+		   595 Query	UPDATE customers SET customer_name = 'Дания (новое имя)' WHERE customer_id = 12
+		   595 Query	SELECT customer_id, customer_name FROM customers WHERE customer_id = 12
+		   595 Query	DELETE FROM sales_unnormalized_2 WHERE report_id IN (1101, 1104)
+		   595 Query	SELECT * FROM sales_unnormalized_2 WHERE customer_id = 12
+		   595 Query	SELECT * FROM customers WHERE customer_id = 12
+		   595 Query	DELETE FROM report_items WHERE report_id IN (1101, 1104)
+		   595 Query	DELETE FROM reports WHERE report_id IN (1101, 1104)
+		   595 Query	SELECT * FROM customers WHERE customer_id = 12
+		   595 Query	INSERT INTO sales_unnormalized_2 (customer_id, customer_name)
+VALUES (99, 'Новый покупатель')
+		   595 Query	SELECT * FROM sales_unnormalized_2 WHERE customer_id = 99
+		   595 Query	INSERT INTO customers (customer_id, customer_name)
+VALUES (99, 'Новый покупатель')
+		   595 Query	SELECT * FROM customers WHERE customer_id = 99
+		   595 Query	ROLLBACK
+		   595 Query	DROP TABLE sales_unnormalized_2
+		   595 Query	SHOW TABLES

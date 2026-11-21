@@ -1,0 +1,13 @@
+Дата: 2026-11-21 22:44:24 MSK
+Лабораторная: 13-fulltext
+SQL-файлы (3): 01_schema.sql, 02_seed.sql, 03_queries.sql
+Коды возврата: 0, 0, 0
+Общий код возврата: 0
+Размер general.log: 4355 байт (4.3 KiB)
+Размер execution-output.txt: 3273 байт
+Строк в my_actions.log: 70
+Дампы (1), всего 2786 байт (2.7 KiB)
+  fulltext_practice: 2786 байт
+Ошибок в execution-output.txt: 0 (показаны первые 20 уникальных)
+  нет
+Фатальные ошибки: нет

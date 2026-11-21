@@ -1,0 +1,160 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   613 Quit	
+261121 22:44:22	   614 Connect	root@localhost on  using SSL/TLS
+		   614 Query	DROP DATABASE IF EXISTS orders_rep_norm
+		   614 Query	CREATE DATABASE IF NOT EXISTS orders_rep_norm
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   614 Query	SELECT DATABASE()
+		   614 Init DB	orders_rep_norm
+		   614 Query	DROP TABLE IF EXISTS order_items
+		   614 Query	DROP TABLE IF EXISTS orders
+		   614 Query	DROP TABLE IF EXISTS products
+		   614 Query	DROP TABLE IF EXISTS representatives
+		   614 Query	DROP TABLE IF EXISTS clients
+		   614 Query	DROP TABLE IF EXISTS orders_rep_unnormalized
+		   614 Query	CREATE TABLE orders_rep_unnormalized (
+    order_id         INT,
+    order_date       DATE,
+    client_id        INT,
+    product_id       INT,
+    product_name     VARCHAR(100),
+    price            DECIMAL(10,2),
+    rep_id           INT,
+    rep_name         VARCHAR(100),
+    quantity         INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   614 Query	CREATE TABLE clients (
+    client_id INT NOT NULL,
+    PRIMARY KEY (client_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   614 Query	CREATE TABLE representatives (
+    rep_id   INT NOT NULL,
+    rep_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (rep_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   614 Query	CREATE TABLE products (
+    product_id   INT NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    price        DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   614 Query	CREATE TABLE orders (
+    order_id   INT NOT NULL,
+    order_date DATE NOT NULL,
+    client_id  INT NOT NULL,
+    rep_id     INT NOT NULL,
+    PRIMARY KEY (order_id),
+    CONSTRAINT fk_orders_client FOREIGN KEY (client_id)
+        REFERENCES clients (client_id),
+    CONSTRAINT fk_orders_rep FOREIGN KEY (rep_id)
+        REFERENCES representatives (rep_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   614 Query	CREATE TABLE order_items (
+    order_id   INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity   INT NOT NULL,
+    PRIMARY KEY (order_id, product_id),
+    CONSTRAINT fk_items_order   FOREIGN KEY (order_id)
+        REFERENCES orders (order_id),
+    CONSTRAINT fk_items_product FOREIGN KEY (product_id)
+        REFERENCES products (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   614 Query	SHOW TABLES
+		   614 Quit	
+		   615 Connect	root@localhost on  using SSL/TLS
+		   615 Query	SELECT DATABASE()
+		   615 Init DB	orders_rep_norm
+		   615 Query	INSERT INTO orders_rep_unnormalized VALUES
+(6001, '2026-11-01', 301, 401, 'Монитор',    15000.00, 901, 'Иванов Иван',     2),
+(6001, '2026-11-01', 301, 402, 'Клавиатура',  2000.00, 901, 'Иванов Иван',     1),
+(6002, '2026-11-02', 302, 403, 'Мышь',        1000.00, 902, 'Петрова Мария',   3),
+(6003, '2026-11-03', 301, 404, 'Наушники',    3500.00, 901, 'Иванов Иван',     1),
+(6003, '2026-11-03', 301, 405, 'Колонки',     2500.00, 901, 'Иванов Иван',     2),
+(6004, '2026-11-04', 303, 401, 'Монитор',    15000.00, 903, 'Сидоров Алексей', 1),
+(6004, '2026-11-04', 303, 402, 'Клавиатура',  2000.00, 903, 'Сидоров Алексей', 4)
+		   615 Query	SELECT * FROM orders_rep_unnormalized ORDER BY order_id, product_id
+		   615 Quit	
+		   616 Connect	root@localhost on  using SSL/TLS
+		   616 Query	SELECT DATABASE()
+		   616 Init DB	orders_rep_norm
+		   616 Query	INSERT INTO clients (client_id)
+SELECT DISTINCT client_id
+FROM orders_rep_unnormalized
+		   616 Query	INSERT INTO representatives (rep_id, rep_name)
+SELECT DISTINCT rep_id, rep_name
+FROM orders_rep_unnormalized
+		   616 Query	INSERT INTO products (product_id, product_name, price)
+SELECT DISTINCT product_id, product_name, price
+FROM orders_rep_unnormalized
+		   616 Query	INSERT INTO orders (order_id, order_date, client_id, rep_id)
+SELECT DISTINCT order_id, order_date, client_id, rep_id
+FROM orders_rep_unnormalized
+		   616 Query	INSERT INTO order_items (order_id, product_id, quantity)
+SELECT order_id, product_id, quantity
+FROM orders_rep_unnormalized
+		   616 Query	SELECT * FROM clients
+		   616 Query	SELECT * FROM representatives
+		   616 Query	SELECT * FROM products
+		   616 Query	SELECT * FROM orders
+		   616 Query	SELECT * FROM order_items
+		   616 Query	SELECT SUM(price * quantity) AS total_old
+FROM orders_rep_unnormalized
+		   616 Query	SELECT SUM(p.price * oi.quantity) AS total_new
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+		   616 Query	SELECT COUNT(DISTINCT order_id) AS old_orders FROM orders_rep_unnormalized
+		   616 Query	SELECT COUNT(*) AS new_orders FROM orders
+		   616 Query	SELECT COUNT(*) AS old_clients FROM
+    (SELECT DISTINCT client_id FROM orders_rep_unnormalized) AS t
+		   616 Query	SELECT COUNT(*) AS new_clients FROM clients
+		   616 Query	SELECT COUNT(*) AS old_products FROM
+    (SELECT DISTINCT product_id FROM orders_rep_unnormalized) AS t
+		   616 Query	SELECT COUNT(*) AS new_products FROM products
+		   616 Query	SELECT COUNT(*) AS old_reps FROM
+    (SELECT DISTINCT rep_id FROM orders_rep_unnormalized) AS t
+		   616 Query	SELECT COUNT(*) AS new_reps FROM representatives
+		   616 Query	SELECT COUNT(*) AS old_items FROM orders_rep_unnormalized
+		   616 Query	SELECT COUNT(*) AS new_items FROM order_items
+		   616 Query	SELECT o.client_id,
+       SUM(p.price * oi.quantity) AS total
+FROM orders o
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p     ON oi.product_id = p.product_id
+WHERE o.client_id = 301
+GROUP BY o.client_id
+		   616 Query	SELECT o.order_id, COUNT(DISTINCT o.rep_id) AS reps_per_order
+FROM orders o
+GROUP BY o.order_id
+ORDER BY o.order_id
+		   616 Query	START TRANSACTION
+		   616 Query	UPDATE orders_rep_unnormalized
+SET rep_name = 'Петрова Мария'
+WHERE order_id = 6001 AND product_id = 401
+		   616 Query	SELECT order_id, rep_id, rep_name
+FROM orders_rep_unnormalized
+WHERE order_id = 6001
+		   616 Query	UPDATE representatives SET rep_name = 'Петрова Мария' WHERE rep_id = 901
+		   616 Query	SELECT * FROM representatives WHERE rep_id = 901
+		   616 Query	SELECT o.order_id, r.rep_id, r.rep_name
+FROM orders o JOIN representatives r ON o.rep_id = r.rep_id
+WHERE o.order_id = 6001
+		   616 Query	DELETE FROM orders_rep_unnormalized WHERE order_id = 6004
+		   616 Query	SELECT * FROM orders_rep_unnormalized WHERE client_id = 303
+		   616 Query	SELECT * FROM clients WHERE client_id = 303
+		   616 Query	SELECT * FROM representatives WHERE rep_id = 903
+		   616 Query	DELETE FROM order_items WHERE order_id = 6004
+		   616 Query	DELETE FROM orders WHERE order_id = 6004
+		   616 Query	SELECT * FROM clients WHERE client_id = 303
+		   616 Query	INSERT INTO orders_rep_unnormalized (rep_id, rep_name)
+VALUES (904, 'Новый представитель')
+		   616 Query	SELECT * FROM orders_rep_unnormalized WHERE rep_id = 904
+		   616 Query	INSERT INTO representatives (rep_id, rep_name)
+VALUES (904, 'Новый представитель')
+		   616 Query	SELECT * FROM representatives WHERE rep_id = 904
+		   616 Query	ROLLBACK
+		   616 Query	DROP TABLE orders_rep_unnormalized
+		   616 Query	SHOW TABLES
+		   616 Quit	

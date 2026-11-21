@@ -1,0 +1,403 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   552 Quit	
+		   553 Connect	root@localhost on  using SSL/TLS
+		   553 Query	DROP DATABASE IF EXISTS sql_practice
+		   553 Query	SET GLOBAL general_log = 'ON'
+		   553 Query	SET GLOBAL log_output = 'TABLE,FILE'
+		   553 Query	SHOW VARIABLES LIKE 'general_log%'
+		   553 Query	SHOW VARIABLES LIKE 'log_output'
+		   553 Query	CREATE DATABASE sql_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   553 Query	SELECT DATABASE()
+		   553 Init DB	sql_practice
+		   553 Query	SHOW DATABASES
+		   553 Query	SHOW TABLES
+		   553 Query	CREATE OR REPLACE VIEW my_actions AS
+SELECT event_time,
+       command_type,
+       CONVERT(argument USING utf8mb4) AS argument
+FROM mysql.general_log
+WHERE user_host LIKE '%root%'
+  AND command_type = 'Query'
+  AND argument NOT LIKE 'SET %'
+  AND argument NOT LIKE 'SHOW %'
+  AND argument NOT LIKE 'SELECT @@%'
+  AND argument NOT LIKE 'SELECT DATABASE()%'
+  AND argument NOT LIKE 'SELECT * FROM my_actions%'
+  AND argument NOT LIKE 'TRUNCATE TABLE mysql.general_log%'
+  AND argument NOT LIKE 'CREATE OR REPLACE VIEW my_actions%'
+		   553 Query	SHOW FULL TABLES WHERE Table_type = 'VIEW'
+		   553 Query	SELECT * FROM my_actions ORDER BY event_time DESC LIMIT 20
+		   553 Quit	
+261121 22:44:17	   554 Connect	root@localhost on  using SSL/TLS
+		   554 Query	SELECT DATABASE()
+		   554 Init DB	sql_practice
+		   554 Query	CREATE TABLE customers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    city VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   554 Query	CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'new',
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   554 Query	SHOW TABLES
+		   554 Query	DESCRIBE customers
+		   554 Query	DESCRIBE orders
+		   554 Quit	
+		   555 Connect	root@localhost on  using SSL/TLS
+		   555 Query	SELECT DATABASE()
+		   555 Init DB	sql_practice
+		   555 Query	SHOW TABLES
+		   555 Query	SELECT * FROM customers
+		   555 Query	SELECT * FROM orders
+		   555 Query	INSERT INTO customers (name, email, city) VALUES
+  ('Иван Иванов', 'ivan@example.com', 'Москва'),
+  ('Пётр Петров', 'petr@example.com', 'Санкт-Петербург'),
+  ('Мария Сидорова', 'maria@example.com', 'Москва'),
+  ('Алексей Смирнов', 'alex@example.com', 'Казань'),
+  ('Ольга Кузнецова', 'olga@example.com', 'Новосибирск')
+		   555 Query	INSERT INTO orders (customer_id, order_date, amount, status) VALUES
+  (1, '2026-10-01', 1500.00, 'paid'),
+  (1, '2026-10-05', 2300.50, 'paid'),
+  (2, '2026-10-03', 800.00, 'new'),
+  (3, '2026-10-07', 4200.00, 'paid'),
+  (3, '2026-10-10', 1100.00, 'cancelled'),
+  (4, '2026-10-12', 950.00, 'new')
+		   555 Query	SELECT * FROM customers
+		   555 Query	SELECT * FROM orders
+		   555 Quit	
+		   556 Connect	root@localhost on  using SSL/TLS
+		   556 Query	SELECT DATABASE()
+		   556 Init DB	sql_practice
+		   556 Query	SELECT * FROM customers
+		   556 Query	SELECT name, city FROM customers
+		   556 Query	SELECT * FROM customers WHERE city = 'Москва'
+		   556 Query	SELECT * FROM orders WHERE amount > 1000
+		   556 Query	SELECT * FROM orders WHERE status = 'paid' AND amount > 1500
+		   556 Query	SELECT * FROM orders WHERE status = 'new' OR status = 'cancelled'
+		   556 Query	SELECT * FROM customers ORDER BY name
+		   556 Query	SELECT * FROM orders ORDER BY amount DESC
+		   556 Query	SELECT * FROM orders ORDER BY order_date DESC, amount ASC
+		   556 Query	SELECT * FROM orders ORDER BY amount DESC LIMIT 3
+		   556 Query	SELECT * FROM customers WHERE name LIKE 'И%'
+		   556 Query	SELECT * FROM customers WHERE email LIKE '%@example.com'
+		   556 Query	SELECT * FROM orders WHERE amount BETWEEN 1000 AND 3000
+		   556 Query	SELECT * FROM customers WHERE city IN ('Москва', 'Казань')
+		   556 Query	SELECT * FROM customers WHERE city = 'Москва' OR city = 'Казань'
+		   556 Query	SELECT * FROM customers WHERE city IS NULL
+		   556 Quit	
+		   557 Connect	root@localhost on  using SSL/TLS
+		   557 Query	SELECT DATABASE()
+		   557 Init DB	sql_practice
+		   557 Query	SELECT COUNT(*) AS total_orders FROM orders
+		   557 Query	SELECT SUM(amount) AS total_sum FROM orders
+		   557 Query	SELECT AVG(amount) AS avg_amount FROM orders
+		   557 Query	SELECT MIN(amount) AS min_amount, MAX(amount) AS max_amount FROM orders
+		   557 Query	SELECT customer_id, COUNT(*) AS order_count, SUM(amount) AS total_amount
+FROM orders
+GROUP BY customer_id
+		   557 Query	SELECT c.name, COUNT(o.id) AS order_count, SUM(o.amount) AS total_amount
+FROM customers c
+JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name
+ORDER BY total_amount DESC
+		   557 Query	SELECT customer_id, SUM(amount) AS total_amount
+FROM orders
+GROUP BY customer_id
+HAVING SUM(amount) > 2000
+		   557 Query	SELECT c.name, o.order_date, o.amount, o.status
+FROM customers c
+INNER JOIN orders o ON c.id = o.customer_id
+		   557 Query	SELECT c.id, o.id FROM customers c JOIN orders o ON c.id = o.customer_id
+		   557 Query	SELECT c.name, o.id AS order_id, o.amount
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+		   557 Query	SELECT c.name, o.id AS order_id
+FROM customers c
+RIGHT JOIN orders o ON c.id = o.customer_id
+		   557 Query	SELECT c.name, o.id AS order_id
+FROM orders o
+LEFT JOIN customers c ON o.customer_id = c.id
+		   557 Query	SELECT c.name,
+       COUNT(o.id) AS order_count,
+       SUM(o.amount) AS total_amount
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name
+ORDER BY total_amount DESC
+		   557 Query	SELECT c.name,
+       COUNT(o.id) AS order_count,
+       COALESCE(SUM(o.amount), 0) AS total_amount
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name
+ORDER BY total_amount DESC
+		   557 Quit	
+		   558 Connect	root@localhost on  using SSL/TLS
+		   558 Query	SELECT DATABASE()
+		   558 Init DB	sql_practice
+		   558 Query	SELECT name, city
+FROM customers
+WHERE id IN (
+    SELECT customer_id
+    FROM orders
+    WHERE amount > 1000
+)
+		   558 Query	SELECT name, city
+FROM customers
+WHERE id = (
+    SELECT customer_id
+    FROM orders
+    ORDER BY amount DESC
+    LIMIT 1
+)
+		   558 Query	SELECT c.name, o.total
+FROM customers c
+JOIN (
+    SELECT customer_id, SUM(amount) AS total
+    FROM orders
+    GROUP BY customer_id
+) o ON c.id = o.customer_id
+WHERE o.total > 2000
+		   558 Query	SELECT c.name,
+       (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.id) AS order_count
+FROM customers c
+		   558 Query	SELECT name FROM customers c
+WHERE EXISTS (
+    SELECT 1 FROM orders o WHERE o.customer_id = c.id
+)
+		   558 Query	SELECT name FROM customers c
+WHERE NOT EXISTS (
+    SELECT 1 FROM orders o WHERE o.customer_id = c.id
+)
+		   558 Query	SELECT name, city FROM customers WHERE city = 'Москва'
+UNION
+SELECT name, city FROM customers WHERE city = 'Казань'
+		   558 Query	SELECT city FROM customers
+UNION ALL
+SELECT city FROM customers
+		   558 Quit	
+		   559 Connect	root@localhost on  using SSL/TLS
+		   559 Query	SELECT DATABASE()
+		   559 Init DB	sql_practice
+		   559 Query	UPDATE customers SET city = 'Екатеринбург' WHERE id = 4
+		   559 Query	UPDATE orders SET status = 'paid' WHERE id = 3
+		   559 Query	SELECT * FROM customers WHERE id = 4
+		   559 Query	SELECT * FROM orders WHERE id = 3
+		   559 Query	DELETE FROM orders WHERE id = 6
+		   559 Query	SELECT * FROM orders
+		   559 Query	ALTER TABLE customers ADD COLUMN phone VARCHAR(20)
+		   559 Query	SELECT * FROM customers
+		   559 Query	UPDATE customers SET phone = '123-36-77' WHERE id = 4
+		   559 Query	SELECT * FROM customers WHERE id = 4
+		   559 Query	SELECT * FROM customers
+		   559 Query	ALTER TABLE customers MODIFY COLUMN phone VARCHAR(30)
+		   559 Query	ALTER TABLE customers DROP COLUMN phone
+		   559 Query	SELECT * FROM customers
+		   559 Quit	
+		   560 Connect	root@localhost on  using SSL/TLS
+		   560 Query	SELECT DATABASE()
+		   560 Init DB	sql_practice
+		   560 Query	SELECT * FROM my_actions ORDER BY event_time DESC
+		   560 Query	SELECT * FROM my_actions
+WHERE argument LIKE '%customers%'
+ORDER BY event_time DESC
+LIMIT 10
+		   560 Query	SET GLOBAL log_output = 'TABLE,FILE'
+		   560 Query	SHOW VARIABLES LIKE 'log_output'
+		   560 Quit	
+		   561 Connect	root@localhost on  using SSL/TLS
+		   561 Query	SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='sql_practice'
+		   561 Quit	
+		   562 Connect	root@localhost on  using SSL/TLS
+		   562 Query	/*!40100 SET @@SQL_MODE='' */
+		   562 Query	/*!40103 SET TIME_ZONE='+00:00' */
+		   562 Query	/*M!100100 SET @@MAX_STATEMENT_TIME=0.000000 */
+		   562 Query	/*M!100100 SET WAIT_TIMEOUT=DEFAULT */
+		   562 Query	SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ
+		   562 Query	START TRANSACTION /*!40100 WITH CONSISTENT SNAPSHOT */
+		   562 Query	UNLOCK TABLES
+		   562 Query	set optimizer_switch='semijoin=off'
+		   562 Query	SELECT LOGFILE_GROUP_NAME, FILE_NAME, TOTAL_EXTENTS, INITIAL_SIZE, ENGINE, EXTRA FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'UNDO LOG' AND FILE_NAME IS NOT NULL AND LOGFILE_GROUP_NAME IS NOT NULL AND LOGFILE_GROUP_NAME IN (SELECT DISTINCT LOGFILE_GROUP_NAME FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'DATAFILE' AND TABLESPACE_NAME IN (SELECT DISTINCT TABLESPACE_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_SCHEMA IN ('sql_practice'))) GROUP BY LOGFILE_GROUP_NAME, FILE_NAME, ENGINE, TOTAL_EXTENTS, INITIAL_SIZE ORDER BY LOGFILE_GROUP_NAME
+		   562 Query	SELECT DISTINCT TABLESPACE_NAME, FILE_NAME, LOGFILE_GROUP_NAME, EXTENT_SIZE, INITIAL_SIZE, ENGINE FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'DATAFILE' AND TABLESPACE_NAME IN (SELECT DISTINCT TABLESPACE_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_SCHEMA IN ('sql_practice')) ORDER BY TABLESPACE_NAME, LOGFILE_GROUP_NAME
+		   562 Query	set optimizer_switch=default
+		   562 Init DB	sql_practice
+		   562 Query	SAVEPOINT sp
+		   562 Query	SHOW FULL TABLES
+		   562 Query	SELECT engine, table_type FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = DATABASE() AND table_name = 'customers'
+		   562 Query	SET SQL_QUOTE_SHOW_CREATE=1
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	show create table `customers`
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	select column_name, extra, generation_expression, data_type from information_schema.columns where table_schema=database() and table_name='customers' order by ordinal_position
+		   562 Query	SELECT /*!40001 SQL_NO_CACHE */ `id`, `name`, `email`, `city`, `created_at` FROM `customers`
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Init DB	sql_practice
+		   562 Query	select @@collation_database
+		   562 Query	SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE EVENT_OBJECT_SCHEMA = DATABASE() AND EVENT_OBJECT_TABLE = 'customers'
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	ROLLBACK TO SAVEPOINT sp
+		   562 Query	SELECT engine, table_type FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = DATABASE() AND table_name = 'my_actions'
+		   562 Query	SET SQL_QUOTE_SHOW_CREATE=1
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	show create table `my_actions`
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	SHOW FIELDS FROM `my_actions`
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Init DB	sql_practice
+		   562 Query	select @@collation_database
+		   562 Query	SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE EVENT_OBJECT_SCHEMA = DATABASE() AND EVENT_OBJECT_TABLE = 'my_actions'
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	ROLLBACK TO SAVEPOINT sp
+		   562 Query	SELECT engine, table_type FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = DATABASE() AND table_name = 'orders'
+		   562 Query	SET SQL_QUOTE_SHOW_CREATE=1
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	show create table `orders`
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	select column_name, extra, generation_expression, data_type from information_schema.columns where table_schema=database() and table_name='orders' order by ordinal_position
+		   562 Query	SELECT /*!40001 SQL_NO_CACHE */ `id`, `customer_id`, `order_date`, `amount`, `status` FROM `orders`
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Init DB	sql_practice
+		   562 Query	select @@collation_database
+		   562 Query	SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE EVENT_OBJECT_SCHEMA = DATABASE() AND EVENT_OBJECT_TABLE = 'orders'
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	ROLLBACK TO SAVEPOINT sp
+		   562 Query	RELEASE SAVEPOINT sp
+		   562 Init DB	sql_practice
+		   562 Query	SHOW FULL TABLES
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	SHOW CREATE TABLE `customers`
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	SHOW CREATE TABLE `my_actions`
+		   562 Query	SELECT CHECK_OPTION, DEFINER, SECURITY_TYPE,        CHARACTER_SET_CLIENT, COLLATION_CONNECTION FROM information_schema.views WHERE table_name='my_actions' AND table_schema='sql_practice'
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Query	SET SESSION character_set_results = 'binary'
+		   562 Query	SHOW CREATE TABLE `orders`
+		   562 Query	SET SESSION character_set_results = 'utf8mb4'
+		   562 Quit	
+		   563 Connect	root@localhost on  using SSL/TLS
+		   563 Query	SELECT DATABASE()
+		   563 Init DB	sql_practice
+		   563 Query	DROP TABLE orders
+		   563 Query	SHOW TABLES
+		   563 Query	DROP TABLE customers
+		   563 Query	SHOW TABLES
+		   563 Query	DROP DATABASE sql_practice
+		   563 Query	SHOW DATABASES
+		   563 Quit	
+		   564 Connect	root@localhost on  using SSL/TLS
+		   564 Query	CREATE DATABASE sql_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   564 Query	SHOW DATABASES
+		   564 Quit	
+		   565 Connect	root@localhost on sql_practice using SSL/TLS
+		   565 Query	/*M!999999 enable the sandbox mode */ 
+
+
+
+
+
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */
+		   565 Query	/*!40103 SET TIME_ZONE='+00:00' */
+		   565 Query	/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */
+		   565 Query	/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */
+		   565 Query	/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */
+		   565 Query	/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */
+		   565 Query	DROP TABLE IF EXISTS `customers`
+		   565 Query	/*!40101 SET @saved_cs_client     = @@character_set_client */
+		   565 Query	/*!40101 SET character_set_client = utf8mb4 */
+		   565 Query	CREATE TABLE `customers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   565 Query	/*!40101 SET character_set_client = @saved_cs_client */
+		   565 Query	LOCK TABLES `customers` WRITE
+		   565 Query	/*!40000 ALTER TABLE `customers` DISABLE KEYS */
+		   565 Query	INSERT INTO `customers` VALUES
+(1,'Иван Иванов','ivan@example.com','Москва','2026-11-21 19:44:17'),
+(2,'Пётр Петров','petr@example.com','Санкт-Петербург','2026-11-21 19:44:17'),
+(3,'Мария Сидорова','maria@example.com','Москва','2026-11-21 19:44:17'),
+(4,'Алексей Смирнов','alex@example.com','Екатеринбург','2026-11-21 19:44:17'),
+(5,'Ольга Кузнецова','olga@example.com','Новосибирск','2026-11-21 19:44:17')
+		   565 Query	/*!40000 ALTER TABLE `customers` ENABLE KEYS */
+		   565 Query	UNLOCK TABLES
+		   565 Query	DROP TABLE IF EXISTS `my_actions`
+		   565 Query	/*!50001 DROP VIEW IF EXISTS `my_actions`*/
+		   565 Query	SET @saved_cs_client     = @@character_set_client
+		   565 Query	SET character_set_client = utf8mb4
+		   565 Query	/*!50001 CREATE VIEW `my_actions` AS SELECT
+ NULL AS `event_time`,
+ NULL AS `command_type`,
+ NULL AS `argument` */
+		   565 Query	SET character_set_client = @saved_cs_client
+		   565 Query	DROP TABLE IF EXISTS `orders`
+		   565 Query	/*!40101 SET @saved_cs_client     = @@character_set_client */
+		   565 Query	/*!40101 SET character_set_client = utf8mb4 */
+		   565 Query	CREATE TABLE `orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_id` int(11) NOT NULL,
+  `order_date` date NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `status` varchar(20) DEFAULT 'new',
+  PRIMARY KEY (`id`),
+  KEY `customer_id` (`customer_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+		   565 Query	/*!40101 SET character_set_client = @saved_cs_client */
+		   565 Query	LOCK TABLES `orders` WRITE
+		   565 Query	/*!40000 ALTER TABLE `orders` DISABLE KEYS */
+		   565 Query	INSERT INTO `orders` VALUES
+(1,1,'2026-10-01',1500.00,'paid'),
+(2,1,'2026-10-05',2300.50,'paid'),
+(3,2,'2026-10-03',800.00,'paid'),
+(4,3,'2026-10-07',4200.00,'paid'),
+(5,3,'2026-10-10',1100.00,'cancelled')
+		   565 Query	/*!40000 ALTER TABLE `orders` ENABLE KEYS */
+		   565 Query	UNLOCK TABLES
+		   565 Query	/*!50001 DROP VIEW IF EXISTS `my_actions`*/
+		   565 Query	/*!50001 SET @saved_cs_client          = @@character_set_client */
+		   565 Query	/*!50001 SET @saved_cs_results         = @@character_set_results */
+		   565 Query	/*!50001 SET @saved_col_connection     = @@collation_connection */
+		   565 Query	/*!50001 SET character_set_client      = utf8mb4 */
+		   565 Query	/*!50001 SET character_set_results     = utf8mb4 */
+		   565 Query	/*!50001 SET collation_connection      = utf8mb4_general_ci */
+		   565 Query	/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `my_actions` AS select `mysql`.`general_log`.`event_time` AS `event_time`,`mysql`.`general_log`.`command_type` AS `command_type`,convert(`mysql`.`general_log`.`argument` using utf8mb4) AS `argument` from `mysql`.`general_log` where `mysql`.`general_log`.`user_host` like '%root%' and `mysql`.`general_log`.`command_type` = 'Query' and `mysql`.`general_log`.`argument`  not like 'SET %' and `mysql`.`general_log`.`argument`  not like 'SHOW %' and `mysql`.`general_log`.`argument`  not like 'SELECT @@%' and `mysql`.`general_log`.`argument`  not like 'SELECT DATABASE()%' and `mysql`.`general_log`.`argument`  not like 'SELECT * FROM my_actions%' and `mysql`.`general_log`.`argument`  not like 'TRUNCATE TABLE mysql.general_log%' and `mysql`.`general_log`.`argument`  not like 'CREATE OR REPLACE VIEW my_actions%' */
+		   565 Query	/*!50001 SET character_set_client      = @saved_cs_client */
+		   565 Query	/*!50001 SET character_set_results     = @saved_cs_results */
+		   565 Query	/*!50001 SET collation_connection      = @saved_col_connection */
+		   565 Query	/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */
+		   565 Query	/*!40101 SET SQL_MODE=@OLD_SQL_MODE */
+		   565 Query	/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */
+		   565 Query	/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */
+		   565 Query	/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */
+		   565 Quit	
+		   566 Connect	root@localhost on  using SSL/TLS
+		   566 Query	SELECT DATABASE()
+		   566 Init DB	sql_practice
+		   566 Query	SHOW TABLES
+		   566 Query	SHOW FULL TABLES WHERE Table_type = 'VIEW'
+		   566 Query	SELECT * FROM customers
+		   566 Query	SELECT * FROM orders
+		   566 Query	SELECT * FROM my_actions LIMIT 5
+		   566 Quit	

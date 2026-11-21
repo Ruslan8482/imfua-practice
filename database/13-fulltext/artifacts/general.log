@@ -1,0 +1,80 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   641 Quit	
+		   642 Connect	root@localhost on  using SSL/TLS
+		   642 Query	DROP DATABASE IF EXISTS fulltext_practice
+		   642 Query	CREATE DATABASE fulltext_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   642 Query	SELECT DATABASE()
+		   642 Init DB	fulltext_practice
+		   642 Query	CREATE TABLE articles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    body TEXT NOT NULL,
+    author VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   642 Quit	
+		   643 Connect	root@localhost on  using SSL/TLS
+		   643 Query	SELECT DATABASE()
+		   643 Init DB	fulltext_practice
+		   643 Query	INSERT INTO articles (title, body, author) VALUES
+  ('MySQL FULLTEXT search', 'MySQL provides full-text search capabilities. You can search for words in text columns using MATCH AGAINST syntax. FULLTEXT indexes are fast.', 'Иван'),
+  ('MySQL replication', 'MySQL replication allows you to replicate data from one server to another. It is useful for backup and scaling. FULLTEXT search works well with replication.', 'Мария'),
+  ('Optimizing MySQL queries', 'Query optimization is important for performance. Use indexes, EXPLAIN, and FULLTEXT search to speed up slow queries.', 'Пётр'),
+  ('InnoDB full-text search', 'InnoDB supports FULLTEXT indexes since MySQL 5.6. InnoDB full-text search is crash-safe and does not have the 50% threshold that MyISAM has.', 'Ольга'),
+  ('Boolean mode in MySQL', 'Boolean mode allows you to use operators like + (required), - (excluded), * (wildcard), and "..." (phrase) in FULLTEXT searches.', 'Алексей')
+		   643 Query	SELECT * FROM articles
+		   643 Quit	
+		   644 Connect	root@localhost on  using SSL/TLS
+		   644 Query	SELECT DATABASE()
+		   644 Init DB	fulltext_practice
+		   644 Query	EXPLAIN SELECT * FROM articles WHERE body LIKE '%replication%'
+		   644 Query	CREATE FULLTEXT INDEX ft_articles ON articles(title, body)
+		   644 Query	SHOW INDEX FROM articles
+		   644 Query	SELECT id, title,
+       MATCH(title, body) AGAINST ('replication') AS score
+FROM articles
+WHERE MATCH(title, body) AGAINST ('replication')
+ORDER BY score DESC
+		   644 Query	SELECT id, title,
+       MATCH(title, body) AGAINST ('replication' IN NATURAL LANGUAGE MODE) AS score
+FROM articles
+WHERE MATCH(title, body) AGAINST ('replication' IN NATURAL LANGUAGE MODE)
+ORDER BY score DESC
+		   644 Query	SELECT id, title, MATCH(title, body) AGAINST ('MySQL replication') AS score
+FROM articles
+WHERE MATCH(title, body) AGAINST ('MySQL replication')
+ORDER BY score DESC
+		   644 Query	SELECT id, title
+FROM articles
+WHERE MATCH(title, body) AGAINST ('+MySQL -replication' IN BOOLEAN MODE)
+		   644 Query	SELECT id, title FROM articles
+WHERE MATCH(title, body) AGAINST ('+MySQL -replication' IN BOOLEAN MODE)
+		   644 Query	SELECT id, title FROM articles
+WHERE MATCH(title, body) AGAINST ('"query optimization"' IN BOOLEAN MODE)
+		   644 Query	SELECT id, title FROM articles
+WHERE MATCH(title, body) AGAINST ('replicat*' IN BOOLEAN MODE)
+		   644 Query	SELECT id, title FROM articles
+WHERE MATCH(title, body) AGAINST ('+MySQL +(index* partition*) -MyISAM' IN BOOLEAN MODE)
+		   644 Query	SELECT id, title,
+       MATCH(title, body) AGAINST ('+MySQL ~performance >FULLTEXT' IN BOOLEAN MODE) AS score
+FROM articles
+WHERE MATCH(title, body) AGAINST ('+MySQL ~performance >FULLTEXT' IN BOOLEAN MODE)
+ORDER BY score DESC
+		   644 Query	SHOW VARIABLES LIKE 'innodb_ft_min_token_size'
+		   644 Query	SHOW VARIABLES LIKE 'innodb_ft_enable_stopword'
+		   644 Query	SHOW VARIABLES LIKE 'innodb_ft_max_token_size'
+		   644 Query	EXPLAIN SELECT * FROM articles WHERE body LIKE '%replication%'
+		   644 Query	EXPLAIN SELECT * FROM articles WHERE MATCH(title, body) AGAINST ('replication')
+		   644 Query	SELECT id, title
+FROM articles
+WHERE MATCH(title, body) AGAINST ('replication' WITH QUERY EXPANSION)
+		   644 Query	SELECT id, title,
+       MATCH(title, body) AGAINST ('replication' WITH QUERY EXPANSION) AS score
+FROM articles
+WHERE MATCH(title, body) AGAINST ('replication' WITH QUERY EXPANSION)
+ORDER BY score DESC
+		   644 Quit	

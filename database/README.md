@@ -1,8 +1,15 @@
+### [Вернуться на Главную](../README.md)
+
+## Навигация
+
+- [Реестр заданий](../TASKS.md)
+- [Архитектура](../ARCHITECTURE.md)
+
 # Лабораторные по основам проектирования баз данных
 
 16 лабораторных из [курса](https://github.com/rurewa/imfua/tree/main/content/Courses/Basics_database_design).
 
-## Каталог
+## 🧰 Каталог
 
 | № | Задание | Что делаем |
 |---|---------|------------|
@@ -23,7 +30,22 @@
 | 15 | `15-index-join` | индексы для JOIN, порядок соединения |
 | 16 | `16-normalization-common` | аномалии → 3NF, проверка переноса данных |
 
-## Запуск
+## ✅ Статус
+
+Все 16 лабораторных **реально выполнены** локальным MariaDB 11.4.14.
+В каждом `NN-*/artifacts/` — настоящие `general.log`, `my_actions.log`,
+`execution-output.txt`, `RESULT.txt` и дампы; отчёты заполнены фактическими результатами.
+
+## 🧰 Запуск
+
+Вариант без Docker (тот, что использовался здесь):
+
+```bash
+bash scripts/start-local-mariadb.sh
+bash scripts/collect-evidence.sh
+```
+
+Вариант с Docker (по оригинальной инструкции):
 
 ```bash
 make run-lab LAB=01-lesson-1
@@ -35,3 +57,5 @@ bash scripts/dump-db.sh 01-lesson-1 <имя_базы>
 
 Общий конфиг `database/_shared/my.cnf` обеспечивает UTF-8 и `general_log`.
 Подробнее — [docs/workflow.md](../docs/workflow.md) и [docs/my-cnf.md](../docs/my-cnf.md).
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

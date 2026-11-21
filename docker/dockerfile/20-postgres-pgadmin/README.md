@@ -1,16 +1,24 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/README.md)
+
 # 20. PostgreSQL + pgAdmin
 
-## Цель
+## 🎯 Цель
 
 Собрать и запустить учебный образ по инструкции источника, зафиксировать команды
 и результат в этом каталоге.
 
-## Источник
+## 🔗 Источник
 
 - Оригинал: [README.md](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/README.md)
 - Реестр заданий: [TASKS.md](../../../TASKS.md)
 
-## Структура каталога
+## 🧰 Структура каталога
 
 ```text
 20-postgres-pgadmin/
@@ -24,7 +32,7 @@
 └── commands.sh
 ```
 
-## Сборка и запуск
+## 📋 Сборка и запуск
 
 ```bash
 cd docker/dockerfile/20-postgres-pgadmin
@@ -34,7 +42,7 @@ bash commands.sh up           # = docker compose up -d --build
 
 Войдите в pgAdmin с `PGADMIN_DEFAULT_EMAIL` / `PGADMIN_DEFAULT_PASSWORD` из `.env`, затем добавьте сервер: `Servers → Register → Server`, Name=`local pg`, Host=`db`, Port=`5432`, Maintenance database=`imfua_demo`, Username/Password из `.env`.
 
-## Проверка
+## ✅ Проверка
 
 ```bash
 docker compose ps
@@ -42,7 +50,7 @@ docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SEL
 curl -f http://localhost:5050/
 ```
 
-## Порты
+## 🧰 Порты
 
 - Хост `5432` → контейнер `5432` (PostgreSQL).
 - Хост `5050` → контейнер `80` (pgAdmin).
@@ -52,7 +60,7 @@ curl -f http://localhost:5050/
 
 Задание самостоятельное: готового пошагового кода в источнике нет, поэтому конфигурация составлена на основе раздела «Самостоятельно» README источника.
 
-## Результаты
+## 📊 Результаты
 
 - Статус сборки: `НЕ ВЫПОЛНЯЛАСЬ (в этой среде нет Docker)`
 - Имя образа: `imfua-postgres-pgadmin`
@@ -65,3 +73,5 @@ curl -f http://localhost:5050/
 ![Результат выполнения задания](evidence/screenshot.png)
 
 > **Внимание:** в этой среде нет Docker, реальная сборка и запуск не выполнялись. Все шаги ниже проверены только статически; реальные логи и скриншоты добавляются на машине с Docker.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

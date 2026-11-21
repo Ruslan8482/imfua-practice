@@ -1,3 +1,11 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/mySQLphpMyAdmin.md)
+
 # 03. MySQL + phpMyAdmin (Docker Compose)
 
 > **Важно:** в среде preparation Docker отсутствует. Конфигурация проверена статически,
@@ -6,7 +14,7 @@
 - Оригинал: [mySQLphpMyAdmin.md](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/mySQLphpMyAdmin.md)
 - Локальная копия источника: `/tmp/opencode/imfua-src/content/Docker/DockerCompose/mySQLphpMyAdmin.md`
 
-## Состав сервисов
+## 🧰 Состав сервисов
 
 | Сервис | Образ | Порт хоста | Назначение |
 |---|---|---|---|
@@ -15,7 +23,7 @@
 
 Сеть: `mysql-pma-network` (bridge). Том: `mysql_data` (данные БД).
 
-## Пошаговый запуск
+## 📋 Пошаговый запуск
 
 1. Убедитесь, что порты 3306 и 8083 свободны: `docker compose ls`.
 2. Подготовьте `.env` (все пароли в шаблоне — заглушки):
@@ -29,7 +37,7 @@
    ```
 4. Дождитесь готовности MySQL (`service_healthy` у phpMyAdmin).
 
-## Проверка
+## ✅ Проверка
 
 - Статус: `docker compose ps -a`.
 - phpMyAdmin: http://localhost:8083
@@ -37,7 +45,7 @@
 - Логи: `docker compose logs -f phpmyadmin`, `docker compose logs mysql`.
 - Вход в контейнер БД: `docker compose exec mysql bash`.
 
-## Остановка и очистка
+## 🧹 Остановка и очистка
 
 ```bash
 docker compose down
@@ -45,7 +53,7 @@ docker compose down -v   # удалит и данные БД
 # или: bash commands.sh clean
 ```
 
-## Результаты
+## 📊 Результаты
 
 - Дата запуска: `<заполнить при реальном запуске>`
 - Статус сервисов: `<вставить вывод docker compose ps>`
@@ -55,3 +63,5 @@ docker compose down -v   # удалит и данные БД
 Скриншот (замените этот блок реальным файлом, например `evidence/mysql-pma.png`):
 
 ![Скриншот phpMyAdmin](evidence/mysql-pma.png)
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

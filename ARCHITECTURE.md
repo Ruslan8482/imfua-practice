@@ -1,10 +1,17 @@
+### [Вернуться на Главную](README.md)
+
+## Навигация
+
+- [Реестр заданий](TASKS.md)
+- [Архитектура](ARCHITECTURE.md)
+
 # Архитектура репозитория практики
 
 Этот репозиторий — результат выполнения практических заданий курсов
 `rurewa/imfua`: «Основы проектирования баз данных», Docker CLI / Dockerfile / Docker Compose
 и CI/CD в GitHub Actions.
 
-## Принципы
+## 🧩 Принципы
 
 1. **Один каталог = одно задание.** Внутри каталога всё, что нужно для запуска и сдачи.
 2. **Воспроизводимость.** Каждая лабораторная поднимается одной командой из `make`,
@@ -17,7 +24,7 @@
    `general_log`, копируется в каталог задания при запуске.
 6. **Только локально.** Никаких push/remote; репозиторий готов к ручному `git init && git add`.
 
-## Структура
+## 🧰 Структура
 
 ```
 imfua-practice/
@@ -61,20 +68,24 @@ imfua-practice/
 └── .github/workflows/name.yml         # рабочие процессы (19 файлов)
 ```
 
-## Именование
+## 🏷️ Именование
 
 - Каталоги заданий: `NN-kebab-case`, где `NN` — порядковый номер в реестре `TASKS.md`.
 - SQL-файлы нумеруются по этапам: схема → данные → запросы/эксперименты.
 - Workflow-файлы называются как тип пайплайна: `ci-python.yml`, `cd-go-ghcr.yml` и т.д.
 
-## Что запускается в этой среде
+## ⚠️ Что запускалось в этой среде
 
-Здесь нет Docker, MySQL, WSL и компиляторов. Поэтому:
-- скрипты и SQL проверены статически (`scripts/check.sh`, `python3`);
-- логи, дампы и скриншоты создаются пользователем при запуске на его машине;
-- в отчётах явно отмечены места, куда вставляются реальные результаты.
+- Docker недоступен, поэтому Docker/Dockerfile/Compose-задания проверены статически
+  (`scripts/check.sh`, YAML/JSON/Python/shell) и готовы к запуску на машине с Docker.
+- Лабораторные по БД выполнены по-настоящему: скачан пользовательский дистрибутив MariaDB 11.4.14,
+  сервер поднят через `scripts/start-local-mariadb.sh`, все 16 лабораторных прогнаны
+  скриптом `scripts/collect-evidence.sh`.
+- В `database/NN-*/artifacts/` лежат реальные `general.log`, `my_actions.log`,
+  `execution-output.txt`, `RESULT.txt` и дампы; отчёты заполнены фактическими результатами.
+- Скриншоты не создавались (нет GUI) — для них оставлены каталоги `evidence/`.
 
-## Ссылки на источники
+## 🔗 Ссылки на источники
 
 Все задания скопированы/адаптированы по инструкциям:
 - https://github.com/rurewa/imfua/tree/main/content/Courses/Basics_database_design
@@ -82,3 +93,5 @@ imfua-practice/
 - https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/README.md
 - https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/README.md
 - https://github.com/rurewa/imfua/blob/main/content/DevOps/CI_CD/README.md
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

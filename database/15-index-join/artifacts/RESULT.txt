@@ -1,0 +1,13 @@
+Дата: 2026-11-21 22:44:26 MSK
+Лабораторная: 15-index-join
+SQL-файлы (4): 01_schema.sql, 02_seed.sql, 03_queries.sql, 04_fk_demo.sql
+Коды возврата: 0, 0, 0, 0
+Общий код возврата: 0
+Размер general.log: 4881 байт (4.8 KiB)
+Размер execution-output.txt: 4513 байт
+Строк в my_actions.log: 122
+Дампы (1), всего 43896 байт (42.9 KiB)
+  join_practice: 43896 байт
+Ошибок в execution-output.txt: 0 (показаны первые 20 уникальных)
+  нет
+Фатальные ошибки: нет

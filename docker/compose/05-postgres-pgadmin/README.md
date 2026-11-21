@@ -1,3 +1,11 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/PostgreSQL_pgAdmin.md)
+
 # 05. PostgreSQL + pgAdmin (Docker Compose)
 
 > **Важно:** в среде preparation Docker отсутствует. Конфигурация проверена статически,
@@ -6,7 +14,7 @@
 - Оригинал: [PostgreSQL_pgAdmin.md](https://github.com/rurewa/imfua/blob/main/content/Docker/DockerCompose/PostgreSQL_pgAdmin.md)
 - Локальная копия источника: `/tmp/opencode/imfua-src/content/Docker/DockerCompose/PostgreSQL_pgAdmin.md`
 
-## Состав сервисов
+## 🧰 Состав сервисов
 
 | Сервис | Образ | Порт хоста | Назначение |
 |---|---|---|---|
@@ -15,7 +23,7 @@
 
 Сеть: `postgres-pgadmin-network` (bridge). Тома: `postgres_data` (БД), `pgadmin_data` (настройки pgAdmin, добавлено сверх источника).
 
-## Пошаговый запуск
+## 📋 Пошаговый запуск
 
 1. Проверьте свободность портов 5432/5050: `docker compose ls`.
 2. Скопируйте шаблон и замените пароли/email:
@@ -29,7 +37,7 @@
    ```
 4. Дождитесь статуса `Up`/`healthy`: `docker compose ps -a`.
 
-## Проверка
+## ✅ Проверка
 
 - pgAdmin: http://localhost:5050
 - Логин pgAdmin: email и пароль из `.env` (по умолчанию в шаблоне `admin@example.com` / заглушка).
@@ -37,7 +45,7 @@
   Maintenance database `mydatabase`, Username/Password — из `.env`.
 - Логи: `docker compose logs -f pgadmin`, `docker compose logs postgres`.
 
-## Остановка и очистка
+## 🧹 Остановка и очистка
 
 ```bash
 docker compose down
@@ -45,7 +53,7 @@ docker compose down -v   # удалит данные БД и настройки 
 # или: bash commands.sh clean
 ```
 
-## Результаты
+## 📊 Результаты
 
 - Дата запуска: `<заполнить при реальном запуске>`
 - Статус сервисов: `<вставить вывод docker compose ps>`
@@ -55,3 +63,5 @@ docker compose down -v   # удалит данные БД и настройки 
 Скриншот (замените этот блок реальным файлом, например `evidence/pgadmin.png`):
 
 ![Скриншот pgAdmin](evidence/pgadmin.png)
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

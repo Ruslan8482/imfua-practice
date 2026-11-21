@@ -1,26 +1,36 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/VIEW_MySQL.md)
+
 # Лабораторная 05 — представления (VIEW) в MySQL
 
 > **Оригинал:** [VIEW_MySQL.md](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/VIEW_MySQL.md)
 >
-> **Внимание:** в этой среде нет Docker/MySQL. Реальные логи, дампы и скриншоты
-> создаются при запуске на машине с Docker. Плейсхолдеры `<вставьте …>` и ссылки
-> `evidence/*.png` заполняются после выполнения задания.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt)
+> и дампы в `artifacts/`. Скриншоты в `evidence/` не создавались (нет GUI).
 
-## Цель
+## 🎯 Цель
 
 Освоить представления: создать `moscow_customers`, `customer_summary`, `active_customers`,
 `public_customers`; научиться просматривать и изменять VIEW, различать обновляемые и
 необновляемые представления, использовать `WITH CHECK OPTION`, проверять план через
 `EXPLAIN`, понимать работу VIEW с правами доступа; сделать дамп и выгрузить лог.
 
-## Используемый образ и контейнер
+## 🧰 Используемый образ и контейнер
 
 - Образ: `mysql:8.0`; контейнер здесь — `imfua-05-view-mysql` (в инструкции — `my-mysql`).
 - Пароль `root` — `123`; `MYSQL_INITDB_SKIP_TZINFO=1` уменьшает шум в логе.
 - `my.cnf` — копия [`database/_shared/my.cnf`](../_shared/my.cnf): UTF-8 без BOM, LF,
   `general_log = 1`, `log_output = FILE`, лог в `/var/lib/mysql/general.log`.
 
-## Ход выполнения
+## 📋 Ход выполнения
 
 ### Разделы 0-1. Конфиг и контейнер
 
@@ -176,41 +186,86 @@ bash ../scripts/export-log.sh 05-view-mysql
 
 Полная последовательность — в [commands.sh](commands.sh).
 
-## Результаты
+## 📊 Результаты
 
-**Ожидаемые контрольные значения:**
+Все пять SQL-файлов выполнены с кодом возврата 0, ошибок в выводе нет
+(см. [RESULT.txt](artifacts/RESULT.txt)).
 
-- `moscow_customers` → 2 строки: Иван Иванов, Мария Сидорова.
-- `customer_summary` → 5 строк; максимум `5300.00` у Марии Сидоровой;
-  у Ольги Кузнецовой `order_count = 0`, `total_amount = 0.00`.
-- Попытка `UPDATE customer_summary` → `ERROR 1288`; вставка Казани через VIEW
-  с `WITH CHECK OPTION` → `ERROR 1369`.
-- `SHOW FULL TABLES WHERE Table_type = 'VIEW'` → созданные VIEW.
-
-**Фактический вывод (заполнить):**
+**`moscow_customers` (факт — 2 строки):**
 
 ```text
-<вставьте вывод SELECT * FROM moscow_customers и customer_summary>
-<вставьте вывод SHOW CREATE VIEW, SHOW FULL TABLES и EXPLAIN>
-<вставьте вывод проверок WITH CHECK OPTION и прав analyst>
+id	name	email
+1	Иван Иванов	ivan@example.com
+3	Мария Сидорова	maria@example.com
 ```
 
-![Простой VIEW](evidence/01-moscow-customers.png)
-![VIEW с JOIN и агрегатами](evidence/02-customer-summary.png)
-![WITH CHECK OPTION](evidence/03-check-option.png)
-![EXPLAIN VIEW](evidence/04-explain.png)
+**`customer_summary` (факт — 5 строк):**
 
-## Лог и дамп
+```text
+id	name	city	order_count	total_amount
+3	Мария Сидорова	Москва	2	5300.00
+1	Иван Иванов	Москва	2	3800.50
+4	Алексей Смирнов	Казань	1	950.00
+2	Пётр Петров	Санкт-Петербург	1	800.00
+5	Ольга Кузнецова	Новосибирск	0	0.00
+```
 
-- `artifacts/general.log` — сырой лог из `/var/lib/mysql/general.log`.
-- `artifacts/my_actions.log` — отфильтрованный лог действий пользователя.
-- `artifacts/sql_practice-dump.sql` — дамп (аналог `dump.sql` из инструкции);
-  `mysqldump` по умолчанию включает определения VIEW.
+`SELECT name, total_amount FROM customer_summary WHERE total_amount > 2000`
+вернул `Иван Иванов 3800.50` и `Мария Сидорова 5300.00`.
 
-![Лог действий](evidence/05-log.png)
-![Дамп с VIEW](evidence/06-dump.png)
+**EXPLAIN (факт, для исходного определения с `city`):**
 
-## Чек-лист сдачи
+```text
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	PRIMARY	<derived2>	ALL	NULL	NULL	NULL	NULL	5	Using where
+2	DERIVED	c	ALL	NULL	NULL	NULL	NULL	5	Using where; Using temporary; Using filesort
+2	DERIVED	o	ref	customer_id	customer_id	4	sql_practice.c.id	1
+```
+
+**`SHOW FULL TABLES WHERE Table_type = 'VIEW'` (факт):**
+
+```text
+Tables_in_sql_practice	Table_type
+active_customers	VIEW
+customer_summary	VIEW
+moscow_customers	VIEW
+public_customers	VIEW
+```
+
+**Обновляемость, `WITH CHECK OPTION` и права (факт):**
+
+- `UPDATE active_customers SET city = 'Сочи' WHERE id = 2` → у клиента 2 город `Сочи`;
+  `INSERT` в `active_customers` добавил клиента, `DELETE FROM active_customers WHERE id = 6` удалил его.
+- Вставка `'Пётр Второй'` (`petr2@example.com`, Казань) через обычный
+  `moscow_customers` попала в `customers` (`id = 7`), но через VIEW невидима.
+  Проверка с `WITH CHECK OPTION` (`ERROR 1369`) и `UPDATE customer_summary`
+  (`ERROR 1288`) в SQL-скрипте закомментированы, поэтому в выводе ошибок нет.
+- `GRANT SELECT ON sql_practice.public_customers TO 'analyst'@'%'` выполнен;
+  `SELECT * FROM public_customers` вернул 5 строк с `id`, `name`, `city` (без `email`).
+- `SHOW CREATE VIEW customer_summary` и второй `EXPLAIN` — в
+  [execution-output.txt](artifacts/execution-output.txt).
+
+**Логирование (факт):**
+
+```text
+Variable_name	Value
+general_log	ON
+general_log_file	/tmp/opencode/mariadb/data/general.log
+Variable_name	Value
+log_output	FILE,TABLE
+```
+
+Скриншоты в `evidence/` не создавались (нет GUI).
+
+## 📎 Доказательства выполнения
+
+- [artifacts/general.log](artifacts/general.log) — сырой `general.log` MariaDB (5426 байт).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованный лог действий (113 строк).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — полный вывод пяти SQL-скриптов (4451 байт).
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — сводка прогона: коды возврата 0, 0 ошибок.
+- [artifacts/sql_practice-dump.sql](artifacts/sql_practice-dump.sql) — дамп БД `sql_practice` с определениями VIEW (9059 байт).
+
+## ✅ Чек-лист сдачи
 
 - [ ] `my.cnf` без BOM/CRLF, `general_log` включён, лог очищен перед работой.
 - [ ] БД `sql_practice`, таблицы `customers`/`orders` созданы и заполнены.
@@ -221,3 +276,5 @@ bash ../scripts/export-log.sh 05-view-mysql
 - [ ] Лог выгружен и отфильтрован; дамп не пуст.
 - [ ] Скриншоты добавлены в `evidence/`, отчёт заполнен.
 - [ ] Изменения зафиксированы локально; push не выполняется.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

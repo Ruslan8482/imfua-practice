@@ -1,0 +1,131 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   655 Quit	
+		   656 Connect	root@localhost on  using SSL/TLS
+		   656 Query	DROP DATABASE IF EXISTS join_practice
+		   656 Query	CREATE DATABASE join_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   656 Query	SELECT DATABASE()
+		   656 Init DB	join_practice
+		   656 Query	CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    vip_level INT DEFAULT 0
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   656 Query	CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'new'
+    
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   656 Quit	
+		   657 Connect	root@localhost on  using SSL/TLS
+		   657 Query	SELECT DATABASE()
+		   657 Init DB	join_practice
+		   657 Query	INSERT INTO users (name, email, vip_level)
+SELECT
+    CONCAT('User', n),
+    CONCAT('user', n, '@example.com'),
+    FLOOR(RAND() * 4)
+FROM (
+    SELECT a.n + b.n * 10 + 1 AS n
+    FROM (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
+          UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+         (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4) b
+) numbers
+		   657 Query	INSERT INTO orders (user_id, order_date, amount, status)
+SELECT
+    FLOOR(1 + RAND() * 50),
+    DATE_ADD('2026-01-01', INTERVAL FLOOR(RAND() * 365) DAY),
+    ROUND(100 + RAND() * 4900, 2),
+    ELT(FLOOR(1 + RAND() * 3), 'new', 'paid', 'cancelled')
+FROM
+    (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+     UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10) a,
+    (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+     UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10) b,
+    (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) c
+		   657 Query	SELECT COUNT(*) FROM users
+		   657 Query	SELECT COUNT(*) FROM orders
+		   657 Quit	
+		   658 Connect	root@localhost on  using SSL/TLS
+		   658 Query	SELECT DATABASE()
+		   658 Init DB	join_practice
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Query	CREATE INDEX idx_user_id ON orders(user_id)
+		   658 Query	SHOW INDEX FROM orders
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Query	SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+ORDER BY o.id
+LIMIT 20
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+STRAIGHT_JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Query	CREATE INDEX idx_user_status ON orders(user_id, status)
+		   658 Query	SHOW INDEX FROM orders
+		   658 Query	SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3 AND o.status = 'paid'
+ORDER BY o.id
+LIMIT 20
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3 AND o.status = 'paid'
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+INNER JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+LEFT JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Query	EXPLAIN SELECT o.id, o.amount, u.name
+FROM orders o
+LEFT JOIN users u ON o.user_id = u.id
+		   658 Query	EXPLAIN FORMAT=JSON
+SELECT o.id, o.amount, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.vip_level = 3
+		   658 Quit	
+		   659 Connect	root@localhost on  using SSL/TLS
+		   659 Query	SELECT DATABASE()
+		   659 Init DB	join_practice
+		   659 Query	CREATE TABLE orders_fk (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'new',
+    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   659 Query	SHOW INDEX FROM orders_fk
+		   659 Query	INSERT INTO orders_fk (user_id, order_date, amount, status)
+SELECT user_id, order_date, amount, status FROM orders
+		   659 Query	SELECT COUNT(*) FROM orders_fk
+		   659 Query	EXPLAIN SELECT f.id, f.amount, u.name
+FROM orders_fk f
+JOIN users u ON f.user_id = u.id
+WHERE u.vip_level = 3
+		   659 Quit	

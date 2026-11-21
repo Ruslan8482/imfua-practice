@@ -1,20 +1,30 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/ORDER_BY_GROUP_BY.md)
+
 # Лабораторная 14 — ускорение ORDER BY / GROUP BY
 
 **Оригинал:** [ORDER_BY_GROUP_BY.md — Ускорение сортировки и группировки в MySQL](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/ORDER_BY_GROUP_BY.md)  
 Локальная копия инструкции (только для чтения): `/tmp/opencode/imfua-src/content/Courses/Basics_database_design/content/bd/ORDER_BY_GROUP_BY.md`
 
-> ⚠️ **Статус отчёта.** В этой среде нет Docker/MySQL: реальные логи, дампы и
-> скриншоты создаются **при запуске на вашей машине** (инструкция требует WSL).
-> Плейсхолдеры `<...>` ниже заменяются реальными значениями `EXPLAIN`.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt)
+> и дампы в `artifacts/`. Скриншоты в `evidence/` не создавались (нет GUI).
 
-## Цель
+## 🎯 Цель
 
 Понять, когда возникают `Using filesort` и `Using temporary`, и научиться
 проектировать индексы под `ORDER BY` / `GROUP BY`: индекс по столбцу сортировки,
 однородная и разнонаправленная сортировка, нисходящий индекс MySQL 8.0+,
 `Loose Index Scan`, `Tight Index Scan` и покрывающий индекс для группировки.
 
-## Состав каталога
+## 🧰 Состав каталога
 
 | Файл | Что делает |
 |------|------------|
@@ -25,7 +35,7 @@
 | `commands.sh` | `docker run`, очистка лога, запуск SQL, экспорт лога, дамп |
 | `artifacts/.gitkeep`, `evidence/.gitkeep` | Каталоги для артефактов и скриншотов |
 
-## Пошаговое выполнение
+## 📋 Пошаговое выполнение
 
 ```bash
 cd imfua-practice
@@ -47,26 +57,36 @@ bash database/14-order-by-group-by/commands.sh    # контейнер imfua-14-
 
 Интерактивно: `docker exec -it imfua-14-order-by-group-by mysql --default-character-set=utf8mb4 -uroot -p` (пароль `123`).
 
-## Результаты: EXPLAIN «до/после»
+## 📊 Результаты: EXPLAIN «до/после»
+
+**СУБД:** MariaDB 11.4.14 (`Version: 11.4.14-MariaDB-log` — первая строка
+`artifacts/general.log` и `artifacts/my_actions.log`). Все значения ниже взяты из
+10 таблиц `EXPLAIN` в `artifacts/execution-output.txt` (блок `03_queries.sql`).
 
 | № / эксперимент | Запрос | До: `type / key / rows / Extra` | После: `type / key / rows / Extra` |
 |-----------------|--------|----------------------------------|-------------------------------------|
-| 1. ORDER BY без индекса | `EXPLAIN SELECT * FROM orders ORDER BY amount DESC;` | `<type>` / `<key>` / `<rows>` / `<Extra>` (ожидается `ALL` / `NULL` / `500` / `Using filesort`) | — |
-| 2. `CREATE INDEX idx_amount` | тот же `EXPLAIN` | `<type>` / `<key>` / `<rows>` / `<Extra>` | `<type>` / `<key>` / `<rows>` / `<Extra>` (ожидается `index` / `idx_amount` / `500` / без `filesort`) |
-| 3. `ORDER BY amount ASC` | `EXPLAIN SELECT * FROM orders ORDER BY amount ASC;` | `<type>` / `<key>` / `<rows>` / `<Extra>` | `<type>` / `<key>` / `<rows>` / `<Extra>` (backward scan) |
-| 3. Два столбца, одинаковое направление | `... ORDER BY status ASC, amount ASC;` | `<type>` / `<key>` / `<rows>` / `<Extra>` | `<type>` / `<key>` / `<rows>` / `<Extra>` (`idx_status_amount`, без `filesort`) |
-| 3. Разное направление | `... ORDER BY status ASC, amount DESC;` | `<type>` / `<key>` / `<rows>` / `<Extra>` (`Using filesort`) | `<type>` / `<key>` / `<rows>` / `<Extra>` (ожидается `idx_status_amount_desc`, без `filesort`) |
-| 4. GROUP BY без индекса | `EXPLAIN SELECT status, COUNT(*) FROM orders GROUP BY status;` | `<type>` / `<key>` / `<rows>` / `<Extra>` (ожидается `Using temporary; Using filesort`) | — |
-| 5. `CREATE INDEX idx_status` | тот же `EXPLAIN` | `<type>` / `<key>` / `<rows>` / `<Extra>` | `<type>` / `<key>` / `<rows>` / `<Extra>` (ожидается `index` / `idx_status` / `4`, без temporary) |
-| 6. `Tight Index Scan` | `EXPLAIN SELECT status, SUM(amount) FROM orders GROUP BY status;` | `<type>` / `<key>` / `<rows>` / `<Extra>` | `<type>` / `<key>` / `<rows>` / `<Extra>` (без `Using temporary`) |
-| 7. Покрывающий индекс | `CREATE INDEX idx_status_amount_cover` + тот же `EXPLAIN` | `<type>` / `<key>` / `<rows>` / `<Extra>` | `<type>` / `<key>` / `<rows>` / `<Extra>` (ожидается `Using index`) |
+| 1. ORDER BY без индекса | `EXPLAIN SELECT * FROM orders ORDER BY amount DESC;` | `ALL` / `NULL` / `500` / `Using filesort` | — |
+| 2. `CREATE INDEX idx_amount` | тот же `EXPLAIN` | `ALL` / `NULL` / `500` / `Using filesort` | `ALL` / `NULL` / `500` / `Using filesort` (MariaDB не выбрала `idx_amount`, `filesort` остался) |
+| 3. `ORDER BY amount ASC` | `EXPLAIN SELECT * FROM orders ORDER BY amount ASC;` | не выведено | `ALL` / `NULL` / `500` / `Using filesort` (backward scan не проявился) |
+| 3. Два столбца, одинаковое направление | `... ORDER BY status ASC, amount ASC;` | не выведено | `ALL` / `NULL` / `500` / `Using filesort` |
+| 3. Разное направление | `... ORDER BY status ASC, amount DESC;` | `ALL` / `NULL` / `500` / `Using filesort` | `ALL` / `NULL` / `500` / `Using filesort` (после `idx_status_amount_desc` план не изменился) |
+| 4. GROUP BY без индекса | `EXPLAIN SELECT status, COUNT(*) FROM orders GROUP BY status;` | `index` / `idx_status_amount` / `500` / `Using index` — «чистого» плана без индекса в выводе нет: к этому моменту уже созданы индексы экспериментов 2–3 | — |
+| 5. `CREATE INDEX idx_status` | тот же `EXPLAIN` | `index` / `idx_status_amount` / `500` / `Using index` | `index` / `idx_status_amount` / `500` / `Using index` (оптимизатор выбрал `idx_status_amount`, не `idx_status`) |
+| 6. `Tight Index Scan` | `EXPLAIN SELECT status, SUM(amount) FROM orders GROUP BY status;` | `index` / `idx_status_amount` / `500` / `Using index` | `index` / `idx_status_amount` / `500` / `Using index` (без `Using temporary`) |
+| 7. Покрывающий индекс | `CREATE INDEX idx_status_amount_cover` + тот же `EXPLAIN` | `index` / `idx_status_amount` / `500` / `Using index` | `index` / `idx_status_amount` / `500` / `Using index` (`idx_status_amount_cover` в плане не выбран) |
 
-Проверка данных: `SELECT COUNT(*) FROM orders;` → `<500>`; `SELECT status, COUNT(*) ...` → `<4 группы>`.
+Проверка данных: `SELECT COUNT(*) FROM orders;` → `500`; `SELECT status, COUNT(*) ...` →
+не выведено (в `artifacts/execution-output.txt` нет вывода группировки).
 
-> Фактический план зависит от статистики и версии MySQL — вписывайте то, что
-> реально вернул ваш `EXPLAIN`; ожидаемые значения в скобках — ориентир.
+> Ожидаемые эффекты из инструкции (`index` + без `filesort` для ORDER BY, `idx_status` для
+> GROUP BY) на MariaDB 11.4.14 не воспроизвелись: фактические планы приведены выше.
+> `Using temporary` в выведенных планах отсутствует; для GROUP BY выбран `idx_status_amount`
+> с `Using index`.
 
-## Места под скриншоты (создаются при запуске)
+## 📸 Места под скриншоты (не создавались — нет GUI)
+
+Файлы `evidence/*.png` не создавались; таблица ниже сохраняет места, где они
+предусмотрены инструкцией.
 
 | Файл | Что фотографируем |
 |------|--------------------|
@@ -79,22 +99,40 @@ bash database/14-order-by-group-by/commands.sh    # контейнер imfua-14-
 | `evidence/07-covering.png` | `EXPLAIN SELECT status, SUM(amount) ...` с `Using index` |
 | `evidence/08-log-dump.png` | `head artifacts/my_actions.log`, `head artifacts/sort_practice-dump.sql` |
 
-## Артефакты
+## 📎 Артефакты
 
 Цепочка: `/var/lib/mysql/general.log` (контейнер) → `artifacts/general.log`
 → `artifacts/my_actions.log` (только ваши действия) → отчёт.
 
 | Путь | Содержимое | Статус |
 |------|------------|--------|
-| `artifacts/general.log` | Полный general.log | Создаётся при запуске |
-| `artifacts/my_actions.log` | Отфильтрованный лог | Создаётся при запуске |
-| `artifacts/sort_practice-dump.sql` | Дамп 500 строк и всех индексов экспериментов | Создаётся при запуске |
-| `database/logs/14-order-by-group-by-actions.log` | Копия лога | Создаётся при запуске |
-| `database/dumps/14-order-by-group-by-sort_practice-dump.sql` | Копия дампа | Создаётся при запуске |
+| `artifacts/general.log` | Полный general.log | Создан |
+| `artifacts/my_actions.log` | Отфильтрованный лог | Создан |
+| `artifacts/execution-output.txt` | Вывод SQL, включая все таблицы `EXPLAIN` | Создан |
+| `artifacts/RESULT.txt` | Сводка: коды возврата 0, ошибок 0 | Создан |
+| `artifacts/sort_practice-dump.sql` | Дамп 500 строк и всех индексов экспериментов | Создан |
+| `database/logs/14-order-by-group-by-actions.log` | Копия лога | Не создавалась (каталога `database/logs` нет) |
+| `database/dumps/14-order-by-group-by-sort_practice-dump.sql` | Копия дампа | Не создавалась (каталога `database/dumps` нет) |
 
-Логи, дампы и PNG игнорируются Git; коммитится только `artifacts/.gitkeep` и `evidence/.gitkeep`.
+Логи и дамп в `artifacts/` созданы при локальном запуске; PNG в `evidence/` не создавались.
 
-## Чек-лист сдачи
+## 📎 Доказательства выполнения
+
+- [artifacts/general.log](artifacts/general.log) — полный general.log; первая строка фиксирует
+  `Version: 11.4.14-MariaDB-log` (MariaDB 11.4.14).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованные действия пользователя
+  (49 строк по `RESULT.txt`).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — реальный вывод SQL со всеми
+  10 планами `EXPLAIN` и `COUNT(*) = 500`.
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — 3 SQL-файла, коды возврата 0, ошибок 0.
+- [artifacts/sort_practice-dump.sql](artifacts/sort_practice-dump.sql) — дамп базы `sort_practice`
+  (21546 байт).
+- `artifacts/.gitkeep` — служебный файл каталога.
+
+> Ниже — исходные критерии сдачи. Пункты про Docker/WSL и скриншоты не применимы:
+> лабораторная выполнялась локально на MariaDB 11.4.14, GUI отсутствует.
+
+## ✅ Чек-лист сдачи
 
 - [ ] MySQL 8.0 поднят с общим `my.cnf`, лог очищен до работы.
 - [ ] Загружено ровно 500 строк (`SELECT COUNT(*)`).
@@ -106,3 +144,5 @@ bash database/14-order-by-group-by/commands.sh    # контейнер imfua-14-
 - [ ] Таблица EXPLAIN «до/после» заполнена, скриншоты в `evidence/`.
 - [ ] Лог и дамп в `artifacts/`; `my_actions.log` без служебных записей.
 - [ ] Ссылка на отчёт отправлена преподавателю; `push` не выполняется.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

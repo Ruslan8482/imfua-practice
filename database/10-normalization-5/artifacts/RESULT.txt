@@ -1,0 +1,13 @@
+Дата: 2026-11-21 22:44:23 MSK
+Лабораторная: 10-normalization-5
+SQL-файлы (3): 01_schema.sql, 02_seed.sql, 03_queries.sql
+Коды возврата: 0, 0, 0
+Общий код возврата: 0
+Размер general.log: 7829 байт (7.6 KiB)
+Размер execution-output.txt: 2548 байт
+Строк в my_actions.log: 156
+Дампы (1), всего 5416 байт (5.3 KiB)
+  orders_class_norm: 5416 байт
+Ошибок в execution-output.txt: 0 (показаны первые 20 уникальных)
+  нет
+Фатальные ошибки: нет

@@ -1,3 +1,6 @@
+-- Повторно запускаемый прогон: чистая БД для этой лабораторной.
+DROP DATABASE IF EXISTS orders_rep_norm;
+
 -- Лабораторная № 4 по нормализации: схема.
 -- Источник: https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Normalization_4.md
 -- В оригинале есть только заголовки таблицы; строки — демонстрационные (см. README.md).

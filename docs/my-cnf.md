@@ -1,3 +1,10 @@
+### [Вернуться на Главную](../README.md)
+
+## Навигация
+
+- [Реестр заданий](../TASKS.md)
+- [Архитектура](../ARCHITECTURE.md)
+
 # Почему `my.cnf` должен быть в UTF-8 без BOM и с LF
 
 (см. предупреждения в инструкциях: [Begin_MySQL_1](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Begin_MySQL_1.md), [FULLTEXT](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/FULLTEXT.md))
@@ -34,3 +41,5 @@ grep -q $'\r' my.cnf && echo CRLF || echo LF
 
 В этом репозитории эталонный файл лежит в `database/_shared/my.cnf`, а
 `scripts/check.sh` проверяет все текстовые файлы на BOM/CRLF.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

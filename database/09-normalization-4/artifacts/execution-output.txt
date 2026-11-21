@@ -1,0 +1,102 @@
+===== BEGIN 01_schema.sql =====
+Tables_in_orders_rep_norm
+clients
+order_items
+orders
+orders_rep_unnormalized
+products
+representatives
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+order_id	order_date	client_id	product_id	product_name	price	rep_id	rep_name	quantity
+6001	2026-11-01	301	401	Монитор	15000.00	901	Иванов Иван	2
+6001	2026-11-01	301	402	Клавиатура	2000.00	901	Иванов Иван	1
+6002	2026-11-02	302	403	Мышь	1000.00	902	Петрова Мария	3
+6003	2026-11-03	301	404	Наушники	3500.00	901	Иванов Иван	1
+6003	2026-11-03	301	405	Колонки	2500.00	901	Иванов Иван	2
+6004	2026-11-04	303	401	Монитор	15000.00	903	Сидоров Алексей	1
+6004	2026-11-04	303	402	Клавиатура	2000.00	903	Сидоров Алексей	4
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+client_id
+301
+302
+303
+rep_id	rep_name
+901	Иванов Иван
+902	Петрова Мария
+903	Сидоров Алексей
+product_id	product_name	price
+401	Монитор	15000.00
+402	Клавиатура	2000.00
+403	Мышь	1000.00
+404	Наушники	3500.00
+405	Колонки	2500.00
+order_id	order_date	client_id	rep_id
+6001	2026-11-01	301	901
+6002	2026-11-02	302	902
+6003	2026-11-03	301	901
+6004	2026-11-04	303	903
+order_id	product_id	quantity
+6001	401	2
+6001	402	1
+6002	403	3
+6003	404	1
+6003	405	2
+6004	401	1
+6004	402	4
+total_old
+66500.00
+total_new
+66500.00
+old_orders
+4
+new_orders
+4
+old_clients
+3
+new_clients
+3
+old_products
+5
+new_products
+5
+old_reps
+3
+new_reps
+3
+old_items
+7
+new_items
+7
+client_id	total
+301	40500.00
+order_id	reps_per_order
+6001	1
+6002	1
+6003	1
+6004	1
+order_id	rep_id	rep_name
+6001	901	Петрова Мария
+6001	901	Иванов Иван
+rep_id	rep_name
+901	Петрова Мария
+order_id	rep_id	rep_name
+6001	901	Петрова Мария
+client_id
+303
+rep_id	rep_name
+903	Сидоров Алексей
+client_id
+303
+order_id	order_date	client_id	product_id	product_name	price	rep_id	rep_name	quantity
+NULL	NULL	NULL	NULL	NULL	NULL	904	Новый представитель	NULL
+rep_id	rep_name
+904	Новый представитель
+Tables_in_orders_rep_norm
+clients
+order_items
+orders
+products
+representatives
+===== END 03_queries.sql : exit=0 =====

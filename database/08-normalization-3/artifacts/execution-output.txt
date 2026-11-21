@@ -1,0 +1,86 @@
+===== BEGIN 01_schema.sql =====
+Tables_in_hr_sales_norm
+departments
+employee_sales
+employee_sales_unnormalized
+employees
+reporting_months
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+employee_id	employee_name	sale_month	sales_amount	department_id	department_name
+1	Иванов Иван	2026-01	120000.00	10	Отдел реализации
+1	Иванов Иван	2026-02	150000.00	10	Отдел реализации
+2	Петрова Мария	2026-01	90000.00	20	Отдел развития
+2	Петрова Мария	2026-02	110000.00	20	Отдел развития
+3	Сидоров Алексей	2026-01	80000.00	30	Отдел экспорта
+3	Сидоров Алексей	2026-02	95000.00	30	Отдел экспорта
+4	Кузнецова Анна	2026-02	70000.00	10	Отдел реализации
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+department_id	department_name
+10	Отдел реализации
+20	Отдел развития
+30	Отдел экспорта
+employee_id	employee_name	department_id
+1	Иванов Иван	10
+2	Петрова Мария	20
+3	Сидоров Алексей	30
+4	Кузнецова Анна	10
+month_id	month_label
+2026-01	2026-01
+2026-02	2026-02
+employee_id	month_id	sales_amount
+1	2026-01	120000.00
+1	2026-02	150000.00
+2	2026-01	90000.00
+2	2026-02	110000.00
+3	2026-01	80000.00
+3	2026-02	95000.00
+4	2026-02	70000.00
+total_old
+715000.00
+total_new
+715000.00
+old_departments
+3
+new_departments
+3
+old_employees
+4
+new_employees
+4
+old_months
+2
+new_months
+2
+old_sales
+7
+new_sales
+7
+employee_id	employee_name	total
+1	Иванов Иван	270000.00
+department_id	department_name	total
+10	Отдел реализации	340000.00
+20	Отдел развития	200000.00
+30	Отдел экспорта	175000.00
+department_id	department_name
+10	Отдел продаж
+10	Отдел реализации
+department_id	department_name
+10	Отдел продаж
+employee_id	employee_name	department_id
+4	Кузнецова Анна	10
+department_id	department_name
+10	Отдел продаж
+employee_id	employee_name	department_id
+4	Кузнецова Анна	10
+employee_id	employee_name	sale_month	sales_amount	department_id	department_name
+NULL	NULL	NULL	NULL	99	Отдел качества
+department_id	department_name
+99	Отдел качества
+Tables_in_hr_sales_norm
+departments
+employee_sales
+employees
+reporting_months
+===== END 03_queries.sql : exit=0 =====

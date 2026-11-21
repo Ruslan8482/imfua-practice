@@ -1,0 +1,95 @@
+===== BEGIN 01_schema.sql =====
+Tables_in_sales_norm
+clients
+products
+sale_items
+sales
+sales_unnormalized
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+sale_id	sale_date	client_id	client_name	client_city	product_id	product_name	unit_price	quantity
+5001	2026-11-01	101	Иванов Иван	Москва	201	Монитор	15000.00	2
+5001	2026-11-01	101	Иванов Иван	Москва	202	Клавиатура	2000.00	1
+5002	2026-11-02	102	Петрова Мария	Санкт-Петербург	203	Мышь	1000.00	3
+5002	2026-11-02	102	Петрова Мария	Санкт-Петербург	204	Наушники	3500.00	1
+5003	2026-11-03	101	Иванов Иван	Москва	205	Колонки	2500.00	2
+5004	2026-11-04	103	Сидоров Алексей	Казань	202	Клавиатура	2000.00	5
+5004	2026-11-04	103	Сидоров Алексей	Казань	203	Мышь	1000.00	2
+5005	2026-11-05	102	Петрова Мария	Санкт-Петербург	201	Монитор	15000.00	1
+5006	2026-11-06	103	Сидоров Алексей	Казань	204	Наушники	3500.00	2
+5006	2026-11-06	103	Сидоров Алексей	Казань	205	Колонки	2500.00	1
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+client_id	client_name	client_city
+101	Иванов Иван	Москва
+102	Петрова Мария	Санкт-Петербург
+103	Сидоров Алексей	Казань
+product_id	product_name	unit_price
+201	Монитор	15000.00
+202	Клавиатура	2000.00
+203	Мышь	1000.00
+204	Наушники	3500.00
+205	Колонки	2500.00
+sale_id	sale_date	client_id
+5001	2026-11-01	101
+5002	2026-11-02	102
+5003	2026-11-03	101
+5004	2026-11-04	103
+5005	2026-11-05	102
+5006	2026-11-06	103
+sale_id	product_id	quantity
+5001	201	2
+5001	202	1
+5002	203	3
+5002	204	1
+5003	205	2
+5004	202	5
+5004	203	2
+5005	201	1
+5006	204	2
+5006	205	1
+total_old
+80000.00
+total_new
+80000.00
+old_sales
+6
+new_sales
+6
+old_clients
+3
+new_clients
+3
+old_products
+5
+new_products
+5
+old_items
+10
+new_items
+10
+client_id	client_name	total
+101	Иванов Иван	37000.00
+client_id	client_name	total
+101	Иванов Иван	37000.00
+102	Петрова Мария	21500.00
+103	Сидоров Алексей	21500.00
+client_id	client_city
+101	Сочи
+101	Москва
+client_id	client_name	client_city
+101	Иванов Иван	Сочи
+client_id	client_name	client_city
+103	Сидоров Алексей	Казань
+client_id	client_name	client_city
+103	Сидоров Алексей	Казань
+sale_id	sale_date	client_id	client_name	client_city	product_id	product_name	unit_price	quantity
+NULL	NULL	104	Новый клиент	Тверь	NULL	NULL	NULL	NULL
+client_id	client_name	client_city
+104	Новый клиент	Тверь
+Tables_in_sales_norm
+clients
+products
+sale_items
+sales
+===== END 03_queries.sql : exit=0 =====

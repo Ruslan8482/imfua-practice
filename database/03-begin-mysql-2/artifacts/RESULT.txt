@@ -1,0 +1,13 @@
+Дата: 2026-11-21 22:44:18 MSK
+Лабораторная: 03-begin-mysql-2
+SQL-файлы (11): 01_setup.sql, 02_schema.sql, 03_seed.sql, 04_select.sql, 05_aggregates_joins.sql, 06_subqueries_union.sql, 07_modify.sql, 08_log_dump.sql, 09_drop.sql, 10_restore.sql, 11_verify.sql
+Коды возврата: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+Общий код возврата: 0
+Размер general.log: 20520 байт (20.0 KiB)
+Размер execution-output.txt: 21145 байт
+Строк в my_actions.log: 367
+Дампы (1), всего 5293 байт (5.2 KiB)
+  sql_practice: 5293 байт
+Ошибок в execution-output.txt: 0 (показаны первые 20 уникальных)
+  нет
+Фатальные ошибки: нет

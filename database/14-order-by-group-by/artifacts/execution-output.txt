@@ -1,0 +1,28 @@
+===== BEGIN 01_schema.sql =====
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+COUNT(*)
+500
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	500	Using filesort
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	500	Using filesort
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	500	Using filesort
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	500	Using filesort
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	500	Using filesort
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	500	Using filesort
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	index	NULL	idx_status_amount	87	NULL	500	Using index
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	index	NULL	idx_status_amount	87	NULL	500	Using index
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	index	NULL	idx_status_amount	87	NULL	500	Using index
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	index	NULL	idx_status_amount	87	NULL	500	Using index
+===== END 03_queries.sql : exit=0 =====

@@ -1,0 +1,96 @@
+===== BEGIN 01_schema.sql =====
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+COUNT(*)
+50
+COUNT(*)
+500
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	NULL	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	Using where
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders	0	PRIMARY	1	id	A	500	NULL	NULL		BTREE			NO
+orders	1	idx_user_id	1	user_id	A	50	NULL	NULL		BTREE			NO
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	idx_user_id	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	Using where
+id	amount	name
+7	4496.70	User37
+13	2418.79	User32
+17	833.70	User37
+20	4190.64	User5
+24	1243.52	User19
+26	2704.59	User19
+28	150.82	User5
+32	3937.42	User32
+33	3405.75	User5
+34	4842.44	User22
+37	4669.45	User22
+42	4580.80	User6
+45	792.13	User6
+46	3482.02	User22
+47	1570.77	User8
+48	329.29	User4
+49	3715.60	User32
+50	1578.17	User16
+52	396.29	User32
+53	3581.04	User16
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	idx_user_id	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	Using where
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	idx_user_id	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	Using where
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders	0	PRIMARY	1	id	A	500	NULL	NULL		BTREE			NO
+orders	1	idx_user_id	1	user_id	A	50	NULL	NULL		BTREE			NO
+orders	1	idx_user_status	1	user_id	A	50	NULL	NULL		BTREE			NO
+orders	1	idx_user_status	2	status	A	166	NULL	NULL	YES	BTREE			NO
+id	amount	name
+7	4496.70	User37
+46	3482.02	User22
+50	1578.17	User16
+52	396.29	User32
+53	3581.04	User16
+57	411.43	User20
+63	988.26	User4
+74	3406.76	User39
+78	1456.24	User47
+100	3340.37	User28
+101	4861.94	User19
+107	3318.95	User4
+112	4990.36	User20
+118	3118.18	User22
+128	3876.53	User47
+134	398.23	User13
+158	2551.29	User8
+167	3901.98	User39
+188	225.87	User28
+195	3191.62	User5
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	u	ALL	PRIMARY	NULL	NULL	NULL	50	Using where
+1	SIMPLE	o	ref	idx_user_id,idx_user_status	idx_user_status	87	join_practice.u.id,const	3	Using index condition
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	idx_user_id,idx_user_status	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	Using where
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	idx_user_id,idx_user_status	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	Using where
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o	ALL	NULL	NULL	NULL	NULL	500	
+1	SIMPLE	u	eq_ref	PRIMARY	PRIMARY	4	join_practice.o.user_id	1	
+EXPLAIN
+{\n  "query_block": {\n    "select_id": 1,\n    "cost": 0.5421036,\n    "nested_loop": [\n      {\n        "table": {\n          "table_name": "o",\n          "access_type": "ALL",\n          "possible_keys": ["idx_user_id", "idx_user_status"],\n          "loops": 1,\n          "rows": 500,\n          "cost": 0.0940644,\n          "filtered": 100\n        }\n      },\n      {\n        "table": {\n          "table_name": "u",\n          "access_type": "eq_ref",\n          "possible_keys": ["PRIMARY"],\n          "key": "PRIMARY",\n          "key_length": "4",\n          "used_key_parts": ["id"],\n          "ref": ["join_practice.o.user_id"],\n          "loops": 500,\n          "rows": 1,\n          "cost": 0.4480392,\n          "filtered": 100,\n          "attached_condition": "u.vip_level = 3"\n        }\n      }\n    ]\n  }\n}
+===== END 03_queries.sql : exit=0 =====
+===== BEGIN 04_fk_demo.sql =====
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders_fk	0	PRIMARY	1	id	A	0	NULL	NULL		BTREE			NO
+orders_fk	1	fk_orders_user	1	user_id	A	0	NULL	NULL		BTREE			NO
+COUNT(*)
+500
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	u	ALL	PRIMARY	NULL	NULL	NULL	50	Using where
+1	SIMPLE	f	ref	fk_orders_user	fk_orders_user	4	join_practice.u.id	1	
+===== END 04_fk_demo.sql : exit=0 =====

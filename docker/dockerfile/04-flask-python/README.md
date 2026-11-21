@@ -1,16 +1,24 @@
+### [Вернуться на Главную](../../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../../TASKS.md)
+- [Архитектура](../../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/Flask+Python_Mini.md)
+
 # 04. Dockerfile. Flask + Python (мини-проект)
 
-## Цель
+## 🎯 Цель
 
 Собрать и запустить учебный образ по инструкции источника, зафиксировать команды
 и результат в этом каталоге.
 
-## Источник
+## 🔗 Источник
 
 - Оригинал: [Flask+Python_Mini.md](https://github.com/rurewa/imfua/blob/main/content/Docker/Dockerfile/Flask+Python_Mini.md)
 - Реестр заданий: [TASKS.md](../../../TASKS.md)
 
-## Структура каталога
+## 🧰 Структура каталога
 
 ```text
 04-flask-python/
@@ -22,7 +30,7 @@
 └── requirements.txt
 ```
 
-## Сборка и запуск
+## 📋 Сборка и запуск
 
 ```bash
 cd docker/dockerfile/04-flask-python
@@ -30,7 +38,7 @@ docker build -t imfua-flask .
 docker run -d -p 8082:5000 --name imfua-flask imfua-flask
 ```
 
-## Проверка
+## ✅ Проверка
 
 ```bash
 curl -f http://localhost:8082/
@@ -39,13 +47,13 @@ curl -f http://localhost:8082/health
 
 Ожидаемые ответы: приветственная строка и `{"status":"healthy"}`.
 
-## Порты
+## 🧰 Порты
 
 Хост `8082` → контейнер `5000` (Flask).
 
 
 
-## Результаты
+## 📊 Результаты
 
 - Статус сборки: `НЕ ВЫПОЛНЯЛАСЬ (в этой среде нет Docker)`
 - Имя образа: `imfua-flask`
@@ -58,3 +66,5 @@ curl -f http://localhost:8082/health
 ![Результат выполнения задания](evidence/screenshot.png)
 
 > **Внимание:** в этой среде нет Docker, реальная сборка и запуск не выполнялись. Все шаги ниже проверены только статически; реальные логи и скриншоты добавляются на машине с Docker.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

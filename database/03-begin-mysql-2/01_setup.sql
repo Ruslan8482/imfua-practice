@@ -1,3 +1,6 @@
+-- Повторно запускаемый прогон: чистая БД для этой лабораторной.
+DROP DATABASE IF EXISTS sql_practice;
+
 -- ============================================================
 -- Лабораторная 03 (Begin_MySQL_2.md), шаг 1.
 -- Настройка логирования в mysql.general_log, БД sql_practice
@@ -10,7 +13,7 @@
 
 -- 1.1. Включить общий лог и направить его в таблицу
 SET GLOBAL general_log = 'ON';
-SET GLOBAL log_output = 'TABLE';
+SET GLOBAL log_output = 'TABLE,FILE';
 
 -- Проверка настроек
 SHOW VARIABLES LIKE 'general_log%';

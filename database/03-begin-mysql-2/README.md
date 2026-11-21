@@ -1,19 +1,29 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Begin_MySQL_2.md)
+
 # Лабораторная 03 — интерактивная работа с MySQL в Docker № 2
 
 > **Оригинал:** [Begin_MySQL_2.md](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Begin_MySQL_2.md)
 >
-> **Внимание:** в этой среде нет Docker/MySQL. Реальные логи, дампы и скриншоты
-> создаются при запуске на вашей машине; плейсхолдеры `<вставьте …>` и ссылки
-> `evidence/*.png` заполняются после выполнения задания.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt)
+> и дампы в `artifacts/`. Скриншоты в `evidence/` не создавались (нет GUI).
 
-## Цель
+## 🎯 Цель
 
 Настроить логирование в таблицу `mysql.general_log`, создать БД `sql_practice`,
 таблицы `customers`/`orders` и VIEW `my_actions`; отработать `SELECT`, агрегаты,
 `GROUP BY`/`HAVING`, `JOIN`, подзапросы, `UNION`, `UPDATE`, `DELETE`, `ALTER TABLE`;
 сделать дамп, удалить и восстановить БД.
 
-## Используемый образ и контейнер
+## 🧰 Используемый образ и контейнер
 
 - Образ: `mysql:8.0`; контейнер здесь: `imfua-03-begin-mysql-2` (в инструкции — `my-mysql`).
 - Пароль `root` — `123`; при первом запуске добавлен `MYSQL_INITDB_SKIP_TZINFO=1`.
@@ -24,7 +34,7 @@
   Для выгрузки `general.log` через `scripts/export-log.sh` шаг 12 дополнительно
   включает `TABLE,FILE` (этот режим прямо описан в инструкции).
 
-## Ход выполнения
+## 📋 Ход выполнения
 
 ### Подготовка
 
@@ -236,41 +246,104 @@ VIEW `my_actions` входит в дамп `sql_practice` и восстанав�
 Полная последовательность с именами контейнера этого репозитория —
 в [commands.sh](commands.sh).
 
-## Результаты
+## 📊 Результаты
 
-**Ожидаемые контрольные значения:**
+Все 11 SQL-файлов выполнены с кодом возврата 0, ошибок в выводе нет
+(см. [RESULT.txt](artifacts/RESULT.txt)).
 
-- `SHOW FULL TABLES WHERE Table_type = 'VIEW'` → `my_actions`.
-- Агрегаты: `total_orders = 6`, `total_sum = 11250.50`,
-  `avg_amount = 1875.083333`, `min_amount = 800.00`, `max_amount = 4200.00`.
-- После `UPDATE`/`DELETE`: у клиента 4 город `Екатеринбург`, у заказа 3 статус
-  `paid`, заказ 6 удалён.
-- После восстановления: 5 клиентов, 5 заказов, VIEW `my_actions` на месте.
-
-**Фактический вывод (заполнить):**
+**Логирование (факт):**
 
 ```text
-<вставьте вывод SHOW VARIABLES, SHOW FULL TABLES и SELECT * FROM my_actions LIMIT 20>
-<вставьте вывод агрегатов, GROUP BY/HAVING, JOIN и подзапросов>
-<вставьте вывод UPDATE/DELETE/ALTER и проверок после восстановления>
+Variable_name	Value
+general_log	ON
+general_log_file	/tmp/opencode/mariadb/data/general.log
+Variable_name	Value
+log_output	FILE,TABLE
 ```
 
-![Лог через VIEW my_actions](evidence/01-my-actions-view.png)
-![Агрегаты и GROUP BY](evidence/02-aggregates.png)
-![JOIN и подзапросы](evidence/03-joins.png)
-![Удаление и восстановление БД](evidence/04-restore.png)
+**Схема и VIEW (факт):** `SHOW FULL TABLES WHERE Table_type = 'VIEW'` →
+`my_actions`; `SHOW TABLES` → `customers`, `my_actions`, `orders`.
+`DESCRIBE customers` и `DESCRIBE orders` — в
+[execution-output.txt](artifacts/execution-output.txt). VIEW `my_actions`
+вывел 20 последних событий, включая `CREATE DATABASE sql_practice`,
+`DROP DATABASE my_database`, `DELETE FROM users WHERE id = 2` и т.д.
 
-## Лог и дамп
+**Агрегаты (факт из `05_aggregates_joins.sql`):**
 
-- `artifacts/general.log` — сырой `general.log` контейнера.
-- `artifacts/my_actions.log` — отфильтрованный лог из `scripts/export-log.sh`.
-- `artifacts/my_actions_export.log` — лог через VIEW (шаг 12.2 инструкции).
-- `artifacts/sql_practice-dump.sql` — дамп без GTID (аналог `dump_clean.sql`).
+```text
+total_orders
+6
+total_sum
+10850.50
+avg_amount
+1808.416667
+min_amount	max_amount
+800.00	4200.00
+```
 
-![Лог действий](evidence/05-log.png)
-![Дамп sql_practice](evidence/06-dump.png)
+⚠️ Контрольные значения в шаблоне (`total_sum = 11250.50`,
+`avg_amount = 1875.083333`) отличаются от фактических; в отчёте указаны только
+значения, реально полученные в выводе.
 
-## Чек-лист сдачи
+**`GROUP BY` / `HAVING` (факт):**
+
+```text
+customer_id	order_count	total_amount
+1	2	3800.50
+2	1	800.00
+3	2	5300.00
+4	1	950.00
+name	order_count	total_amount
+Мария Сидорова	2	5300.00
+Иван Иванов	2	3800.50
+Алексей Смирнов	1	950.00
+Пётр Петров	1	800.00
+customer_id	total_amount
+1	3800.50
+3	5300.00
+```
+
+**`JOIN` (факт):** `INNER JOIN` вернул 6 строк (Иван ×2, Пётр, Мария ×2, Алексей);
+`LEFT JOIN` добавил `Ольга Кузнецова | NULL | NULL`, а с `COALESCE` —
+`Ольга Кузнецова | 0 | 0.00`; `RIGHT JOIN` и его эквивалент — по 6 строк.
+
+**Подзапросы и `UNION` (факт):** клиенты из Москвы — Иван Иванов, Мария Сидорова;
+`NOT IN` — Ольга Кузнецова; `UNION` (name, city) для Москва + Казань дал 3 строки
+(Иван Иванов, Мария Сидорова, Алексей Смирнов), `UNION ALL` для городов — 10 строк
+(по 5 от каждого `SELECT`, дубликаты сохранены).
+
+**`UPDATE` / `DELETE` / `ALTER` (факт):**
+
+```text
+4	Алексей Смирнов	alex@example.com	Екатеринбург	2026-11-21 22:39:42
+3	2	2026-10-03	800.00	paid
+4	Алексей Смирнов	alex@example.com	Екатеринбург	2026-11-21 22:39:42	123-36-77
+```
+
+Столбец `phone` добавлен (`123-36-77` у клиента 4), изменён на `VARCHAR(30)`
+и удалён; заказ 6 удалён (осталось 5 заказов).
+
+**Удаление и восстановление (факт):** после `DROP TABLE orders` → `customers`,
+`my_actions`; после `DROP TABLE customers` → `my_actions`; после
+`DROP DATABASE sql_practice` базы в списке нет. После импорта дампа — 5 клиентов,
+5 заказов и VIEW `my_actions` на месте (строка
+`my_actions	VIEW` в `SHOW FULL TABLES`).
+
+Полный вывод всех шагов (включая большой вывод VIEW в `08_log_dump.sql`) —
+в [execution-output.txt](artifacts/execution-output.txt).
+
+Скриншоты в `evidence/` не создавались (нет GUI).
+
+## 📎 Доказательства выполнения
+
+- [artifacts/general.log](artifacts/general.log) — сырой `general.log` MariaDB (20755 байт).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованный лог действий (367 строк).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — полный вывод 11 SQL-скриптов (21145 байт).
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — сводка прогона: коды возврата 0, 0 ошибок.
+- [artifacts/sql_practice-dump.sql](artifacts/sql_practice-dump.sql) — дамп БД `sql_practice` без GTID (6038 байт).
+- [artifacts/sql_practice-pre-drop-dump.sql](artifacts/sql_practice-pre-drop-dump.sql) — дамп перед удалением БД (5528 байт).
+
+## ✅ Чек-лист сдачи
 
 - [ ] Лог включён, `log_output = TABLE` (затем `TABLE,FILE` для выгрузки).
 - [ ] БД `sql_practice`, таблицы `customers`/`orders` и VIEW `my_actions` созданы.
@@ -281,3 +354,5 @@ VIEW `my_actions` входит в дамп `sql_practice` и восстанав�
 - [ ] VIEW `my_actions` присутствует после восстановления.
 - [ ] Скриншоты добавлены в `evidence/`, отчёт заполнен.
 - [ ] Изменения зафиксированы локально; push не выполняется.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

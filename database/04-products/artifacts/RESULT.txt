@@ -1,0 +1,13 @@
+Дата: 2026-11-21 22:44:19 MSK
+Лабораторная: 04-products
+SQL-файлы (6): 01_schema.sql, 02_seed.sql, 03_queries.sql, 04_drop.sql, 04_restore.sql, 04_verify.sql
+Коды возврата: 0, 0, 0, 0, 0, 0
+Общий код возврата: 0
+Размер general.log: 8997 байт (8.8 KiB)
+Размер execution-output.txt: 2945 байт
+Строк в my_actions.log: 165
+Дампы (1), всего 2345 байт (2.3 KiB)
+  shop: 2345 байт
+Ошибок в execution-output.txt: 0 (показаны первые 20 уникальных)
+  нет
+Фатальные ошибки: нет

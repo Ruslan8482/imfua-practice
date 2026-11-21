@@ -1,0 +1,42 @@
+===== BEGIN 01_schema.sql =====
+Tables_in_sales
+customers
+products
+report_items
+reports
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+customer_id	customer_name
+12	Дания
+23	Испания
+25	Албания
+product_id	product_name	price
+101	Дыня	800
+102	Клубника	150
+103	Яблоко	120
+104	Лимон	200
+report_id	report_date	customer_id
+1101	2026-03-05	12
+1102	2026-03-07	23
+1103	2026-03-08	25
+1104	2026-03-10	12
+1105	2026-03-12	25
+report_id	product_id	quantity
+1101	101	1100
+1101	102	300
+1102	103	1700
+1103	104	500
+1104	101	2500
+1105	103	2000
+1105	104	700
+report_id	report_date	customer_name	product_name	price	quantity
+1101	2026-03-05	Дания	Дыня	800	1100
+1101	2026-03-05	Дания	Клубника	150	300
+1102	2026-03-07	Испания	Яблоко	120	1700
+1103	2026-03-08	Албания	Лимон	200	500
+1104	2026-03-10	Дания	Дыня	800	2500
+1105	2026-03-12	Албания	Яблоко	120	2000
+1105	2026-03-12	Албания	Лимон	200	700
+===== END 03_queries.sql : exit=0 =====

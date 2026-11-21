@@ -1,19 +1,29 @@
+### [Вернуться на Главную](../../README.md)
+
+## Навигация
+
+- [Реестр заданий](../../TASKS.md)
+- [Архитектура](../../ARCHITECTURE.md)
+- [Источник](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Begin_MySQL_1.md)
+
 # Лабораторная 02 — интерактивная работа с MySQL в Docker № 1
 
 > **Оригинал:** [Begin_MySQL_1.md](https://github.com/rurewa/imfua/blob/main/content/Courses/Basics_database_design/content/bd/Begin_MySQL_1.md)
 >
-> **Внимание:** в этой среде нет Docker/MySQL. Реальные логи, дампы и скриншоты
-> создаются при запуске на машине с Docker. Все плейсхолдеры `<вставьте …>` и ссылки
-> `evidence/*.png` в этом шаблоне нужно заменить фактическими результатами.
+> ✅ **Статус отчёта: выполнено.** Лабораторная реально выполнена локально на MariaDB 11.4.14
+> (совместимый с MySQL 8.0 дистрибутив), а не в Docker: Docker в этой среде недоступен.
+> Доказательства: [general.log](artifacts/general.log), [my_actions.log](artifacts/my_actions.log),
+> [execution-output.txt](artifacts/execution-output.txt), [RESULT.txt](artifacts/RESULT.txt).
+> Скриншоты в `evidence/` не создавались (нет GUI).
 
-## Цель
+## 🎯 Цель
 
 Запустить «чистый» контейнер MySQL, подключиться к нему, выполнить основные операции
 с БД `my_database` и таблицей `users` (`CREATE`, `INSERT`, `SELECT`, `UPDATE`,
 `DELETE`, `DROP`), сделать дамп и выгрузить лог с минимальным количеством служебных
 записей.
 
-## Используемый образ и контейнер
+## 🧰 Используемый образ и контейнер
 
 - Образ: `mysql:8.0`; контейнер здесь: `imfua-02-begin-mysql-1` (в инструкции — `my-mysql`).
 - Пароль `root` — `123` (как в инструкции).
@@ -21,7 +31,7 @@
   `general_log = 1`, `log_output = FILE`, лог в `/var/lib/mysql/general.log`.
   Это критично: BOM/CRLF заставят MySQL молча проигнорировать конфиг.
 
-## Ход выполнения
+## 📋 Ход выполнения
 
 ### Шаг 1. Запуск контейнера
 
@@ -154,15 +164,38 @@ docker logs my-mysql > log.txt
 
 Полная последовательность — в [commands.sh](commands.sh).
 
-## Результаты
+## 📊 Результаты
 
-**База и таблица созданы (ожидается):**
+Все четыре SQL-файла выполнены с кодом возврата 0, ошибок в выводе нет
+(см. [RESULT.txt](artifacts/RESULT.txt)).
+
+**`SHOW VARIABLES LIKE 'character_set%'` (факт):**
 
 ```text
-<вставьте вывод SHOW DATABASES и SHOW TABLES: my_database, users>
+Variable_name	Value
+character_set_client	latin1
+character_set_collations	
+character_set_connection	latin1
+character_set_database	utf8mb4
+character_set_filesystem	binary
+character_set_results	latin1
+character_set_server	utf8mb4
+character_set_system	utf8mb3
+character_sets_dir	/usr/local/mysql/share/charsets/
 ```
 
-**Данные `users` после вставки (ожидается 5 строк):**
+**База и таблица созданы (факт):**
+
+```text
+Tables_in_my_database
+users
+```
+
+`SHOW DATABASES` после создания содержит `my_database`; после `DROP DATABASE my_database`
+в списке её нет (полный вывод обоих списков — в
+[execution-output.txt](artifacts/execution-output.txt)).
+
+**Данные `users` после вставки (факт — 5 строк):**
 
 | id | name | email |
 |----|------|-------|
@@ -172,29 +205,48 @@ docker logs my-mysql > log.txt
 | 4  | Павел Иванов | pavel@example.com |
 | 5  | Марк Аврелий | mark@example.com |
 
-**Фактический вывод (заполнить):**
+**Фактический вывод (`execution-output.txt`):**
+
+`SELECT name, HEX(name) FROM users WHERE id = 1` до `UPDATE`:
 
 ```text
-<вставьте вывод SELECT * FROM users, SELECT name, HEX(name) ... и UPDATE-проверок>
-<вставьте вывод SHOW TABLES / SHOW DATABASES после DROP>
+name	HEX(name)
+Иван Иванов	C390CB9CC390C2B2C390C2B0C390C2BD20C390CB9CC390C2B2C390C2B0C390C2BDC390C2BEC390C2B2
 ```
 
-![Создание БД и таблицы users](evidence/01-users-table.png)
-![Результаты SELECT и UPDATE](evidence/02-select-update.png)
-![Удаление таблицы и БД](evidence/03-drop.png)
+`SELECT * FROM users` после обоих `UPDATE` (факт — 5 строк):
 
-## Лог и дамп
+```text
+id	name	email
+1	Vasya	ivan@example.com
+2	Пётр Петров	petr@example.com
+3	Мария Сидорова	maria@example.com
+4	Павел Иванов	pavel@example.com
+5	Марк Аврелий	mark@example.com
+```
 
-- `artifacts/general.log` — исходный лог MySQL.
-- `artifacts/my_actions.log` — отфильтрованный лог; в инструкции он называется
-  `my_actions.log` (аналог `my_actions_export.log` в следующей лабораторной).
-- `artifacts/my_database-dump.sql` — дамп БД `my_database`; в инструкции файл
-  назывался `dump_clean.sql`, создаётся до шагов `DELETE`/`DROP`.
+`SELECT * FROM users` после `DELETE FROM users WHERE id = 2` (факт — 4 строки),
+затем `SHOW TABLES` (пусто) и `SHOW DATABASES` без `my_database`:
 
-![Лог действий](evidence/04-log.png)
-![Дамп my_database](evidence/05-dump.png)
+```text
+id	name	email
+1	Vasya	ivan@example.com
+3	Мария Сидорова	maria@example.com
+4	Павел Иванов	pavel@example.com
+5	Марк Аврелий	mark@example.com
+```
 
-## Чек-лист сдачи
+Скриншоты в `evidence/` не создавались (нет GUI).
+
+## 📎 Доказательства выполнения
+
+- [artifacts/general.log](artifacts/general.log) — исходный `general.log` сервера MariaDB (2455 байт).
+- [artifacts/my_actions.log](artifacts/my_actions.log) — отфильтрованный лог действий пользователя (49 строк).
+- [artifacts/execution-output.txt](artifacts/execution-output.txt) — полный вывод четырёх SQL-скриптов (2715 байт).
+- [artifacts/RESULT.txt](artifacts/RESULT.txt) — сводка прогона: коды возврата 0, 0 ошибок; дампов нет,
+  поскольку `my_database` была удалена (`Пропущены несуществующие БД: my_database`).
+
+## ✅ Чек-лист сдачи
 
 - [ ] `my.cnf` без BOM/CRLF, `general_log` включён, лог очищен перед работой.
 - [ ] БД `my_database`, таблица `users` с `AUTO_INCREMENT` и `UNIQUE(email)` созданы.
@@ -204,3 +256,5 @@ docker logs my-mysql > log.txt
 - [ ] `artifacts/my_actions.log` содержит только действия пользователя.
 - [ ] Скриншоты добавлены в `evidence/`, отчёт заполнен.
 - [ ] Изменения зафиксированы локально; push не выполняется.
+
+> Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

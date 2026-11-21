@@ -75,8 +75,9 @@ CREATE INDEX idx_customer_amount ON orders(customer_id, amount);
 EXPLAIN SELECT customer_id, SUM(amount) FROM orders GROUP BY customer_id;
 -- Ожидаемый план: type = index, key = idx_customer_amount, Extra = Using index.
 
--- MySQL 8.0.18+: реальное время выполнения шагов плана
-EXPLAIN ANALYZE SELECT * FROM orders WHERE amount > 1000;
+-- MySQL 8.0.18+: EXPLAIN ANALYZE SELECT * FROM orders WHERE amount > 1000;
+-- MariaDB 11.4: аналог — отдельный оператор ANALYZE.
+ANALYZE SELECT * FROM orders WHERE amount > 1000;
 
 -- ------------------------------------------------------------
 -- Итог (шпаргалка раздела 10):

@@ -1,0 +1,61 @@
+===== BEGIN 01_schema.sql =====
+===== END 01_schema.sql : exit=0 =====
+===== BEGIN 02_seed.sql =====
+Tables_in_index_practice
+customers
+orders
+id	name	email	city	created_at
+1	Иван Иванов	ivan@example.com	Москва	2026-11-21 22:44:23
+2	Пётр Петров	petr@example.com	Санкт-Петербург	2026-11-21 22:44:23
+3	Мария Сидорова	maria@example.com	Москва	2026-11-21 22:44:23
+4	Алексей Смирнов	alex@example.com	Казань	2026-11-21 22:44:23
+5	Ольга Кузнецова	olga@example.com	Новосибирск	2026-11-21 22:44:23
+id	customer_id	order_date	amount	status
+1	1	2026-10-01	1500.00	paid
+2	1	2026-10-05	2300.50	paid
+3	2	2026-10-03	800.00	new
+4	3	2026-10-07	4200.00	paid
+5	3	2026-10-10	1100.00	cancelled
+6	4	2026-10-12	950.00	new
+===== END 02_seed.sql : exit=0 =====
+===== BEGIN 03_queries.sql =====
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders	0	PRIMARY	1	id	A	1	NULL	NULL		BTREE			NO
+orders	1	customer_id	1	customer_id	A	1	NULL	NULL		BTREE			NO
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	6	Using where
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders	0	PRIMARY	1	id	A	6	NULL	NULL		BTREE			NO
+orders	1	customer_id	1	customer_id	A	6	NULL	NULL		BTREE			NO
+orders	1	idx_amount	1	amount	A	6	NULL	NULL		BTREE			NO
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	range	idx_amount	idx_amount	5	NULL	4	Using index condition
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	6	Using where
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders	0	PRIMARY	1	id	A	6	NULL	NULL		BTREE			NO
+orders	1	customer_id	1	customer_id	A	6	NULL	NULL		BTREE			NO
+orders	1	idx_amount	1	amount	A	6	NULL	NULL		BTREE			NO
+orders	1	idx_order_date	1	order_date	A	6	NULL	NULL		BTREE			NO
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	range	idx_order_date	idx_order_date	3	NULL	6	Using index condition
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Ignored
+orders	0	PRIMARY	1	id	A	6	NULL	NULL		BTREE			NO
+orders	1	customer_id	1	customer_id	A	6	NULL	NULL		BTREE			NO
+orders	1	idx_amount	1	amount	A	6	NULL	NULL		BTREE			NO
+orders	1	idx_order_date	1	order_date	A	6	NULL	NULL		BTREE			NO
+orders	1	idx_status_amount	1	status	A	3	NULL	NULL	YES	BTREE			NO
+orders	1	idx_status_amount	2	amount	A	6	NULL	NULL		BTREE			NO
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ref	idx_status_amount	idx_status_amount	83	const	3	Using index condition
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	range	idx_amount,idx_status_amount	idx_status_amount	88	NULL	3	Using index condition
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	range	idx_amount	idx_amount	5	NULL	4	Using index condition
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	ALL	NULL	NULL	NULL	NULL	6	Using where
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	orders	index	NULL	idx_customer_amount	9	NULL	6	Using index
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	r_rows	filtered	r_filtered	Extra
+1	SIMPLE	orders	range	idx_amount	idx_amount	5	NULL	4	4.00	100.00	100.00	Using index condition
+===== END 03_queries.sql : exit=0 =====

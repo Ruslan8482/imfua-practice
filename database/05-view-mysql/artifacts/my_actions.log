@@ -1,0 +1,113 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   584 Query	DROP DATABASE IF EXISTS sql_practice
+		   584 Query	CREATE DATABASE sql_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   584 Query	SELECT DATABASE()
+		   584 Init DB	sql_practice
+		   584 Query	CREATE TABLE customers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    city VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   584 Query	CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'new',
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   584 Query	SHOW TABLES
+		   585 Query	SELECT DATABASE()
+		   585 Init DB	sql_practice
+		   585 Query	INSERT INTO customers (name, email, city) VALUES
+  ('Иван Иванов', 'ivan@example.com', 'Москва'),
+  ('Пётр Петров', 'petr@example.com', 'Санкт-Петербург'),
+  ('Мария Сидорова', 'maria@example.com', 'Москва'),
+  ('Алексей Смирнов', 'alex@example.com', 'Казань'),
+  ('Ольга Кузнецова', 'olga@example.com', 'Новосибирск')
+		   585 Query	INSERT INTO orders (customer_id, order_date, amount, status) VALUES
+  (1, '2026-10-01', 1500.00, 'paid'),
+  (1, '2026-10-05', 2300.50, 'paid'),
+  (2, '2026-10-03', 800.00, 'new'),
+  (3, '2026-10-07', 4200.00, 'paid'),
+  (3, '2026-10-10', 1100.00, 'cancelled'),
+  (4, '2026-10-12', 950.00, 'new')
+		   585 Query	SHOW TABLES
+		   585 Query	SELECT * FROM customers
+		   585 Query	SELECT * FROM orders
+		   586 Query	SELECT DATABASE()
+		   586 Init DB	sql_practice
+		   586 Query	CREATE VIEW moscow_customers AS
+SELECT id, name, email
+FROM customers
+WHERE city = 'Москва'
+		   586 Query	SELECT * FROM moscow_customers
+		   586 Query	CREATE VIEW customer_summary AS
+SELECT c.id,
+       c.name,
+       c.city,
+       COUNT(o.id)              AS order_count,
+       COALESCE(SUM(o.amount), 0) AS total_amount
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name, c.city
+		   586 Query	SELECT * FROM customer_summary ORDER BY total_amount DESC
+		   586 Query	SELECT name, total_amount FROM customer_summary WHERE total_amount > 2000
+		   586 Query	EXPLAIN SELECT * FROM customer_summary WHERE city = 'Москва'
+		   586 Query	SELECT * FROM customer_summary WHERE city = 'Москва'
+		   586 Query	SHOW FULL TABLES WHERE Table_type = 'VIEW'
+		   586 Query	SHOW TABLES
+		   586 Query	SHOW CREATE VIEW customer_summary
+		   586 Query	SELECT * FROM moscow_customers
+		   586 Query	CREATE OR REPLACE VIEW moscow_customers AS
+SELECT id, name, email, created_at
+FROM customers
+WHERE city = 'Москва'
+		   586 Query	SELECT * FROM moscow_customers
+		   586 Query	DROP VIEW moscow_customers
+		   586 Query	DROP VIEW IF EXISTS moscow_customers
+		   586 Query	SHOW TABLES
+		   586 Query	CREATE VIEW active_customers AS
+SELECT id, name, email, city
+FROM customers
+WHERE city IS NOT NULL
+		   586 Query	UPDATE active_customers SET city = 'Сочи' WHERE id = 2
+		   586 Query	SELECT * FROM customers WHERE id = 2
+		   586 Query	INSERT INTO active_customers (name, email, city)
+VALUES ('Новый Клиент', 'new@example.com', 'Уфа')
+		   586 Query	DELETE FROM active_customers WHERE id = 6
+		   586 Query	SELECT * FROM customers
+		   586 Query	CREATE OR REPLACE VIEW customer_summary AS
+SELECT c.id, c.name, COUNT(o.id) AS order_count
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name
+		   586 Query	EXPLAIN SELECT * FROM customer_summary
+		   587 Query	SELECT DATABASE()
+		   587 Init DB	sql_practice
+		   587 Query	CREATE OR REPLACE VIEW moscow_customers AS
+SELECT id, name, email, city
+FROM customers
+WHERE city = 'Москва'
+		   587 Query	INSERT INTO moscow_customers (name, email, city)
+VALUES ('Пётр Второй', 'petr2@example.com', 'Казань')
+		   587 Query	SELECT * FROM customers WHERE email = 'petr2@example.com'
+		   587 Query	SELECT * FROM moscow_customers
+		   587 Query	CREATE OR REPLACE VIEW moscow_customers AS
+SELECT id, name, email, city
+FROM customers
+WHERE city = 'Москва'
+WITH CHECK OPTION
+		   587 Query	DELETE FROM customers WHERE email IN ('petr2@example.com', 'petr3@example.com')
+		   587 Query	CREATE VIEW public_customers AS
+SELECT id, name, city FROM customers
+		   587 Query	CREATE USER IF NOT EXISTS 'analyst'@'%' IDENTIFIED BY 'pass'
+		   587 Query	GRANT SELECT ON sql_practice.public_customers TO 'analyst'@'%'
+		   587 Query	SELECT * FROM public_customers
+		   587 Query	SHOW FULL TABLES WHERE Table_type = 'VIEW'

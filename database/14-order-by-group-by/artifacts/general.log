@@ -1,0 +1,56 @@
+/tmp/opencode/mariadb/bin/mariadbd, Version: 11.4.14-MariaDB-log (MariaDB Server). started with:
+Tcp port: 0  Unix socket: /tmp/opencode/mariadb/run/mysqld.sock
+Time		    Id Command	Argument
+		   648 Quit	
+261121 22:44:25	   649 Connect	root@localhost on  using SSL/TLS
+		   649 Query	DROP DATABASE IF EXISTS sort_practice
+		   649 Query	CREATE DATABASE sort_practice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci
+		   649 Query	SELECT DATABASE()
+		   649 Init DB	sort_practice
+		   649 Query	CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'new',
+    order_date DATE NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    INDEX idx_customer (customer_id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+		   649 Quit	
+		   650 Connect	root@localhost on  using SSL/TLS
+		   650 Query	SELECT DATABASE()
+		   650 Init DB	sort_practice
+		   650 Query	INSERT INTO orders (customer_id, status, order_date, amount)
+SELECT
+    FLOOR(1 + RAND() * 50),
+    ELT(FLOOR(1 + RAND() * 4), 'new', 'paid', 'cancelled', 'shipped'),
+    DATE_ADD('2026-01-01', INTERVAL FLOOR(RAND() * 365) DAY),
+    ROUND(100 + RAND() * 4900, 2)
+FROM
+    (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+     UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10) a,
+    (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+     UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10) b,
+    (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) c
+		   650 Query	SELECT COUNT(*) FROM orders
+		   650 Quit	
+		   651 Connect	root@localhost on  using SSL/TLS
+		   651 Query	SELECT DATABASE()
+		   651 Init DB	sort_practice
+		   651 Query	EXPLAIN SELECT * FROM orders ORDER BY amount DESC
+		   651 Query	CREATE INDEX idx_amount ON orders(amount)
+		   651 Query	EXPLAIN SELECT * FROM orders ORDER BY amount DESC
+		   651 Query	EXPLAIN SELECT * FROM orders ORDER BY amount ASC
+		   651 Query	CREATE INDEX idx_status_amount ON orders(status, amount)
+		   651 Query	EXPLAIN SELECT * FROM orders ORDER BY status ASC, amount ASC
+		   651 Query	EXPLAIN SELECT * FROM orders ORDER BY status ASC, amount DESC
+		   651 Query	CREATE INDEX idx_status_amount_desc ON orders(status ASC, amount DESC)
+		   651 Query	EXPLAIN SELECT * FROM orders ORDER BY status ASC, amount DESC
+		   651 Query	EXPLAIN SELECT status, COUNT(*) FROM orders GROUP BY status
+		   651 Query	CREATE INDEX idx_status ON orders(status)
+		   651 Query	EXPLAIN SELECT status, COUNT(*) FROM orders GROUP BY status
+		   651 Query	EXPLAIN SELECT status, SUM(amount) FROM orders GROUP BY status
+		   651 Query	CREATE INDEX idx_status_amount_cover ON orders(status, amount)
+		   651 Query	EXPLAIN SELECT status, SUM(amount) FROM orders GROUP BY status
+		   651 Quit	
