@@ -110,7 +110,7 @@ docker rm -f my-redis || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Redis.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Redis.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 10](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

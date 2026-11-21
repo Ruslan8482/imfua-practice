@@ -121,7 +121,7 @@ docker rm -f welcome-to-docker || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [WelcomeToDocker.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/WelcomeToDocker.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 03](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

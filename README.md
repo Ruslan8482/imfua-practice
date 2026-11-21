@@ -82,7 +82,9 @@ bash scripts/dump-db.sh 01-lesson-1 sales
 Скрипты воспроизведения: [`scripts/start-local-mariadb.sh`](scripts/start-local-mariadb.sh),
 [`scripts/collect-evidence.sh`](scripts/collect-evidence.sh).
 Workflow'ы CI/CD запускались в GitHub Actions при push; статус виден во вкладке
-[Actions](https://github.com/Ruslan8482/imfua-practice/actions).
+[Actions](https://github.com/Ruslan8482/imfua-practice/actions) и в сводке
+[ci-cd/GITHUB-ACTIONS.md](ci-cd/GITHUB-ACTIONS.md).
+GitHub Pages включён: https://ruslan8482.github.io/imfua-practice/.
 
 ## ⚠️ Важно
 

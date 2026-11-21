@@ -19,11 +19,16 @@
 
 ## 🧰 Как использовать
 
-1. Скопируйте репозиторий в свой GitHub-аккаунт (push выполняете сами, в этой среде он не делался).
+1. Репозиторий уже опубликован как `Ruslan8482/imfua-practice`; при fork'е push выполняете сами.
 2. Workflow автоматически подхватятся из `.github/workflows/`.
 3. Для публикации артефактов задайте permissions `packages: write` / `contents: write`
    (уже прописаны в соответствующих файлах).
-4. Для GitHub Pages включите `Settings → Pages → Source: GitHub Actions`.
+4. GitHub Pages включён (`Source: GitHub Actions`), сайт: https://ruslan8482.github.io/imfua-practice/.
+
+## ✅ Результаты запусков
+
+Фактические статусы всех 19 workflow собраны в [GITHUB-ACTIONS.md](GITHUB-ACTIONS.md).
+Обновить файл можно командой `GH_TOKEN=... bash scripts/collect-actions-results.sh`.
 
 Workflow с `*BIN*` публикуют бинарники только по `tag` (`v*`) — создайте тег локально и
 отправьте его в свой репозиторий при необходимости.

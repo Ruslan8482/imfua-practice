@@ -118,8 +118,8 @@ rm -f share/test.txt || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [HTTPserverFiles.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/HTTPserverFiles.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 17](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Примечание: Для монтирования используется подготовленный каталог share/ (в источнике монтировался весь каталог проекта).
 

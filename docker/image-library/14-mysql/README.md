@@ -135,7 +135,7 @@ docker rm -f my-mysql || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [MySQL.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/MySQL.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 14](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

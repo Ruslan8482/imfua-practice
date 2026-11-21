@@ -163,8 +163,8 @@ docker rm -f ollama open-webui || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Ollama.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Ollama.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 23](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 ### Полезные ссылки
 

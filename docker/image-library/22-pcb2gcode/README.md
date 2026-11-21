@@ -131,8 +131,8 @@ docker rm -f ngargaud-insolante || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Pcb2gcode.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Pcb2gcode.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 22](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 ### Полезные ссылки
 

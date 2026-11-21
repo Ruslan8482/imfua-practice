@@ -101,8 +101,8 @@ docker rm -f node-js || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Node.jsForJS.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Node.jsForJS.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 13](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Примечание: Добавлен запуск подготовленного файла index.js (в источнике использовался только REPL и node -e).
 

@@ -147,7 +147,7 @@ docker volume rm portainer_data || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Portainer.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Portainer.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 16](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

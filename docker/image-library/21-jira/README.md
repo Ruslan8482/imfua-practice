@@ -110,7 +110,7 @@ docker rm -f jira || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Jira.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Jira.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 21](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

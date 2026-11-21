@@ -107,8 +107,8 @@ docker rm -f alt || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [AltInDocker.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/AltInDocker.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 06](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Примечание: В исходном README.md ссылка на AltInDocker.md указана дважды (п. 6 и п. 23); создан один каталог 06-alt-linux, как и в реестре TASKS.md.
 

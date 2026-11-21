@@ -116,8 +116,8 @@ docker rm -f my-apache-server || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [file-server.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/file-server.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 20](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Примечание: Для монтирования используется подготовленный каталог share/ (в источнике монтировался весь каталог проекта).
 

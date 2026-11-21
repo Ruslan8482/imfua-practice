@@ -126,8 +126,8 @@ docker rmi hello-world || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [DockerHub.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/DockerHub.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 01](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Примечание: Исходный файл DockerHub.md отсутствует в локальной копии источника; содержание восстановлено по оглавлению исходного README.md и этапам из Nginx.md.
 

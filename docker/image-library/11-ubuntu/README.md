@@ -110,7 +110,7 @@ docker rm -f ubuntu || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Ubuntu.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Ubuntu.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 11](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Если вы обнаружили ошибку в этом тексте - сообщите пожалуйста автору!

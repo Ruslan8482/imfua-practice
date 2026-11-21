@@ -3,9 +3,9 @@ package main
 import "strings"
 
 type Board struct {
-	Port	string
-	FQBN	string
-	Name	string
+	Port string
+	FQBN string
+	Name string
 }
 
 func ParseBoardLine(line string) (Board, bool) {
@@ -14,8 +14,8 @@ func ParseBoardLine(line string) (Board, bool) {
 		return Board{}, false
 	}
 	return Board{
-		Port:	parts[0],
-		FQBN:	parts[1],
-		Name:	strings.Join(parts[2:], " "),
+		Port: parts[0],
+		FQBN: parts[1],
+		Name: strings.Join(parts[2:], " "),
 	}, true
 }

@@ -4,8 +4,8 @@ import "testing"
 
 func TestGreeting(t *testing.T) {
 	tests := []struct {
-		name	string
-		want	string
+		name string
+		want string
 	}{
 		{name: "", want: "Hello, Fyne!"},
 		{name: "CI", want: "Hello, CI!"},

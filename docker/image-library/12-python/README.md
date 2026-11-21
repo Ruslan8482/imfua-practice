@@ -108,8 +108,8 @@ docker rm -f python || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [Python.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/Python.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 12](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 > Примечание: В источнике скрипт назывался script.py; по требованиям репозитория файл назван hello.py, команды запуска адаптированы соответствующим образом.
 

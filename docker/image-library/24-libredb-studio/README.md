@@ -122,8 +122,8 @@ docker image rm ghcr.io/libredb/libredb-studio:latest || true
 ## 🔗 Источник
 
 - Оригинальная инструкция: [LibreDB_Studio.md](https://github.com/rurewa/imfua/blob/main/content/Docker/ImageLibrary/LibreDB_Studio.md)
-- Реестр заданий: [TASKS.md § Docker CLI, п. 24](../../TASKS.md)
-- Обзор трека: [docker/README.md](../README.md)
+- Реестр заданий: ](../../../TASKS.md)
+- Обзор трека: ](../../../README.md)
 
 ### Полезные ссылки
 

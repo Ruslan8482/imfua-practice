@@ -7,11 +7,11 @@ import (
 )
 
 type IntelHexRecord struct {
-	ByteCount	int
-	Address		int
-	Type		int
-	Data		[]byte
-	Checksum	int
+	ByteCount int
+	Address   int
+	Type      int
+	Data      []byte
+	Checksum  int
 }
 
 func ParseIntelHex(line string) (IntelHexRecord, error) {
@@ -33,11 +33,11 @@ func ParseIntelHex(line string) (IntelHexRecord, error) {
 	}
 
 	record := IntelHexRecord{
-		ByteCount:	int(raw[0]),
-		Address:	int(raw[1])<<8 | int(raw[2]),
-		Type:		int(raw[3]),
-		Data:		raw[4 : len(raw)-1],
-		Checksum:	int(raw[len(raw)-1]),
+		ByteCount: int(raw[0]),
+		Address:   int(raw[1])<<8 | int(raw[2]),
+		Type:      int(raw[3]),
+		Data:      raw[4 : len(raw)-1],
+		Checksum:  int(raw[len(raw)-1]),
 	}
 	return record, nil
 }
