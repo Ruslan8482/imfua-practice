@@ -1,0 +1,37 @@
+name: "CI: Hello Java!"
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Maven verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test
+        working-directory: ci-cd/pipelines/java
+        run: mvn -B verify
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-java-jar
+          path: ci-cd/pipelines/java/target/hello-java-1.0.0.jar
+          if-no-files-found: error

@@ -1,0 +1,18 @@
+name: imfua-cloudbeaver
+
+services:
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:${CB_IMAGE_TAG:-latest}
+    container_name: cloudbeaver
+    restart: unless-stopped
+    ports:
+      - "${CB_PORT:-8978}:8978"
+    volumes:
+      - ./workspace:/opt/cloudbeaver/workspace
+      - ./logs:/opt/cloudbeaver/logs
+    networks:
+      - cloudbeaver-network
+
+networks:
+  cloudbeaver-network:
+    driver: bridge

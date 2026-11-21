@@ -1,0 +1,20 @@
+# Логи и дампы — генерируются при запуске, в Git не попадают
+*.log
+!database/logs/.gitkeep
+**/artifacts/*
+!**/artifacts/.gitkeep
+database/dumps/*
+!database/dumps/.gitkeep
+**/evidence/*
+!**/evidence/.gitkeep
+*-dump.sql
+dump.sql
+
+# Временное
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.vscode/
+*.tmp
+*~

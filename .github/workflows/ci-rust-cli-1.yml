@@ -1,0 +1,85 @@
+name: "CI: Rust CLI (variant 1)"
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ci-cd/pipelines/rust-cli-1
+
+      - name: Check formatting
+        working-directory: ci-cd/pipelines/rust-cli-1
+        run: cargo fmt --all -- --check
+
+      - name: Run Clippy
+        working-directory: ci-cd/pipelines/rust-cli-1
+        run: cargo clippy --all-targets -- -D warnings
+
+  build:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary: hello-rust-1
+          - os: macos-latest
+            binary: hello-rust-1
+          - os: windows-latest
+            binary: hello-rust-1.exe
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ci-cd/pipelines/rust-cli-1
+
+      - name: Check code
+        working-directory: ci-cd/pipelines/rust-cli-1
+        run: cargo check --verbose
+
+      - name: Build release
+        working-directory: ci-cd/pipelines/rust-cli-1
+        run: cargo build --release --verbose
+
+      - name: Test
+        working-directory: ci-cd/pipelines/rust-cli-1
+        run: cargo test --verbose
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-cli-1-${{ matrix.os }}
+          path: ci-cd/pipelines/rust-cli-1/target/release/${{ matrix.binary }}
+          if-no-files-found: error

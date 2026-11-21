@@ -1,0 +1,69 @@
+name: "CI: Node.js REST API"
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint & Test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["18.x", "20.x", "22.x"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('ci-cd/pipelines/nodejs/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        working-directory: ci-cd/pipelines/nodejs
+        run: npm install --no-audit --no-fund
+
+      - name: Lint
+        working-directory: ci-cd/pipelines/nodejs
+        run: npm run lint
+
+      - name: Test REST API
+        working-directory: ci-cd/pipelines/nodejs
+        run: npm test
+
+  docker-build:
+    name: Build Docker Image (no push)
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ci-cd/pipelines/nodejs
+          load: true
+          tags: my-node-app:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

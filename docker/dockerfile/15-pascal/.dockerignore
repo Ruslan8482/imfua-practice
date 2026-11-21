@@ -1,0 +1,6 @@
+*.o
+*.ppu
+.git
+.gitignore
+README.md
+commands.sh

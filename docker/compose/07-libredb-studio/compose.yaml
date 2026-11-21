@@ -1,0 +1,32 @@
+name: imfua-libredb-studio
+
+services:
+  libredb-studio:
+    image: ${LIBREDB_IMAGE:-ghcr.io/libredb/libredb-studio:latest}
+    container_name: libredb-studio
+    restart: unless-stopped
+    ports:
+      - "${LIBREDB_PORT:-3000}:3000"
+    environment:
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@libredb.org}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env (min 32 chars)}
+      STORAGE_PROVIDER: sqlite
+      STORAGE_SQLITE_PATH: /app/data/libredb-storage.db
+    volumes:
+      - libredb-data:/app/data
+    networks:
+      - libredb-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  libredb-network:
+    driver: bridge
+
+volumes:
+  libredb-data:

@@ -1,0 +1,47 @@
+name: imfua-joomla
+
+services:
+  db:
+    image: mariadb:11.5.2
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${JOOMLA_DB_NAME:-joomla_db}
+      MYSQL_USER: ${JOOMLA_DB_USER:-joomla_user}
+      MYSQL_PASSWORD: ${JOOMLA_DB_PASSWORD:?set JOOMLA_DB_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - joomla-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p\"$$MYSQL_ROOT_PASSWORD\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  joomla:
+    image: joomla:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${JOOMLA_PORT:-8082}:80"
+    environment:
+      JOOMLA_DB_HOST: db:3306
+      JOOMLA_DB_USER: ${JOOMLA_DB_USER:-joomla_user}
+      JOOMLA_DB_PASSWORD: ${JOOMLA_DB_PASSWORD:?set JOOMLA_DB_PASSWORD in .env}
+      JOOMLA_DB_NAME: ${JOOMLA_DB_NAME:-joomla_db}
+    volumes:
+      - joomla_data:/var/www/html
+    networks:
+      - joomla-network
+
+networks:
+  joomla-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  joomla_data:

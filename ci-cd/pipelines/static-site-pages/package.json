@@ -1,0 +1,14 @@
+{
+  "name": "static-site-pages",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Чистый HTML + CSS + JS для GitHub Pages",
+  "scripts": {
+    "validate": "html-validate index.html && stylelint \"**/*.css\" && eslint script.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "html-validate": "^8.24.0",
+    "stylelint": "^16.10.0"
+  }
+}
