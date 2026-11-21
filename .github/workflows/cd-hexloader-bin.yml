@@ -10,6 +10,8 @@ permissions:
 
 env:
   CGO_ENABLED: "1"
+  # Fyne 2.5 падает на "language: tag is not well-formed" с LANG=C.UTF-8
+  LANG: en_US.UTF-8
 
 jobs:
   test:
@@ -99,10 +101,20 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $candidates = @('C:\msys64\mingw64\bin\gcc.exe', 'C:\msys64\ucrt64\bin\gcc.exe')
-          $gcc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          $gcc = Get-Command gcc.exe -ErrorAction SilentlyContinue
+          if (-not $gcc) {
+            $roots = @('C:\msys64', 'D:\msys64', "$env:RUNNER_TEMP\msys64")
+            foreach ($root in $roots) {
+              $candidate = Get-ChildItem -Path $root -Filter gcc.exe -Recurse -ErrorAction SilentlyContinue |
+                Where-Object { $_.FullName -match '(mingw64|ucrt64)\\bin\\gcc\.exe$' } |
+                Select-Object -First 1
+              if ($candidate) { $gcc = $candidate; break }
+            }
+          }
           if (-not $gcc) { throw "gcc.exe не найден" }
-          "CC=$gcc" >> $env:GITHUB_ENV
+          $path = if ($gcc.Path) { $gcc.Path } else { $gcc.FullName }
+          Split-Path $path -Parent | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          "CC=$path" >> $env:GITHUB_ENV
 
       - name: Resolve dependencies
         working-directory: ci-cd/pipelines/hexloader-bin
